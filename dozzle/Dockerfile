@@ -8,7 +8,7 @@ FROM amir20/dozzle:${DOZZLE_VERSION} AS dozzle_upstream
 ARG BUILD_FROM=ghcr.io/home-assistant/base:3.23
 FROM ${BUILD_FROM}
 
-ARG BUILD_VERSION=0.0.4
+ARG BUILD_VERSION=0.0.5
 ARG BUILD_ARCH=amd64
 
 RUN apk add --no-cache jq curl

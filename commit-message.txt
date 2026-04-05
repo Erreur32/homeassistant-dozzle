@@ -1,5 +1,4 @@
-release: v0.0.4
+release: v0.0.5
 
-- English documentation and layout: README, dozzle/README, dozzle/DOCS; IMPORTANT block (full UI vs agent-only).
-- update_version.sh: sync README release badge, release tag URL, packaged semver; bundled Dozzle from Dockerfile ARG.
-- CHANGELOG.md at repo root; dozzle/CHANGELOG.md aligned for v0.0.4.
+- CI fix: remove .github/workflows/docker-image.yml (no Dockerfile at repo root, caused build errors on every push)
+- builder.yaml is the only workflow needed

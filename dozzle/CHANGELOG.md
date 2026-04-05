@@ -6,6 +6,12 @@ A copy also lives at the repository root: [`CHANGELOG.md`](../CHANGELOG.md).
 
 ---
 
+## 0.0.5 — 2026-04-05
+
+- **CI fix:** remove unused `.github/workflows/docker-image.yml` that referenced a non-existent `Dockerfile` at the repo root and caused build errors on every push. `builder.yaml` is the only workflow needed.
+
+---
+
 ## 0.0.4 — 2026-04-05
 
 - **Documentation (English):** repository [`README.md`](../README.md), [`dozzle/README.md`](README.md), [`DOCS.md`](DOCS.md) — clearer structure (tables, sections), shield badges and My Home Assistant add-repo flow; IMPORTANT block corrected (full Dozzle web UI + Ingress, not the agent-only add-on).
