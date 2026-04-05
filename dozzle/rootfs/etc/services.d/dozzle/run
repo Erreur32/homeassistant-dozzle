@@ -1,9 +1,9 @@
 #!/usr/bin/with-contenv bashio
 # ==============================================================================
 # Home Assistant App — Dozzle
-# Ingress : --base depuis bashio::addon.ingress_entry
-# Agent optionnel : expose cet hôte aux autres instances Dozzle (dozzle agent)
-# s6-overlay : https://github.com/just-containers/s6-overlay
+# Ingress  : --base from bashio::addon.ingress_entry
+# Agent    : optional built-in dozzle agent (enable_agent option)
+# s6-overlay: https://github.com/just-containers/s6-overlay
 # ==============================================================================
 
 set -e
@@ -18,41 +18,44 @@ declare ENABLE_ACTIONS
 declare INGRESS_ENTRY
 declare REMOTE_AGENTS
 declare AGENT_PORT
+declare AGENT_HOSTNAME
 declare ENABLE_AGENT
 
-# --- Docker socket (docker_api: true dans config.yaml) ---
+# --- Docker socket (docker_api: true in config.yaml) -------------------------
 if [ -S /var/run/docker.sock ]; then
-    bashio::log.info "Docker socket présent"
     if curl -s --unix-socket /var/run/docker.sock http://localhost/version >/dev/null 2>&1; then
         DOCKER_VERSION="$(curl -s --unix-socket /var/run/docker.sock http://localhost/version | jq -r '.Version')"
-        bashio::log.info "API Docker OK — version ${DOCKER_VERSION}"
+        bashio::log.info "Docker API OK — engine version ${DOCKER_VERSION}"
     else
-        bashio::log.warning "Socket Docker présent mais l’API ne répond pas"
+        bashio::log.warning "Docker socket found but API is not responding"
     fi
 else
-    bashio::log.error "Pas de socket à /var/run/docker.sock — activez docker_api dans le manifest"
+    bashio::log.error "No socket at /var/run/docker.sock — enable docker_api in the manifest"
 fi
 
-# --- Ingress (proxy Supervisor / intégration panel frontend) ---
+# --- Ingress (Supervisor proxy / panel frontend) ------------------------------
 INGRESS_ENTRY="$(bashio::addon.ingress_entry)"
-bashio::log.info "Ingress entry: ${INGRESS_ENTRY}"
 DOZZLE_BASE_PATH="${INGRESS_ENTRY}"
-bashio::log.info "Dozzle --base: ${DOZZLE_BASE_PATH}"
+bashio::log.info "Ingress base path: ${DOZZLE_BASE_PATH}"
 
 DOZZLE_ADDR=":8080"
 
+# --- Read options from HA config ---------------------------------------------
 LOG_LEVEL="$(bashio::config 'log_level' 'info')"
 FILTER="$(bashio::config 'filter' '')"
 NO_ANALYTICS="$(bashio::config 'no_analytics' 'true')"
 ENABLE_ACTIONS="$(bashio::config 'enable_actions' 'false')"
 ENABLE_AGENT="$(bashio::config 'enable_agent' 'false')"
 AGENT_PORT="$(bashio::config 'agent_port' '7007')"
+AGENT_HOSTNAME="$(bashio::config 'agent_hostname' '')"
 REMOTE_AGENTS="$(bashio::config 'remote_agents' '')"
 
+# --- Build Dozzle argument list ----------------------------------------------
 DOZZLE_ARGS=(
-    "--addr" "${DOZZLE_ADDR}"
-    "--base" "${DOZZLE_BASE_PATH}"
+    "--addr"  "${DOZZLE_ADDR}"
+    "--base"  "${DOZZLE_BASE_PATH}"
     "--level" "${LOG_LEVEL}"
+    "--auth-provider" "none"
 )
 
 if bashio::var.true "${NO_ANALYTICS}"; then
@@ -61,49 +64,58 @@ fi
 
 if bashio::var.has_value "${FILTER}"; then
     DOZZLE_ARGS+=("--filter" "${FILTER}")
-    bashio::log.info "Filtre conteneurs: ${FILTER}"
+    bashio::log.info "Container filter: ${FILTER}"
 fi
 
 if bashio::var.true "${ENABLE_ACTIONS}"; then
     DOZZLE_ARGS+=("--enable-actions")
-    bashio::log.info "Actions conteneur (restart/stop) activées"
+    bashio::log.info "Container actions (restart/stop) enabled"
 fi
 
-DOZZLE_ARGS+=("--auth-provider" "none")
-
-if bashio::var.has_value "${REMOTE_AGENTS}"; then
-    export DOZZLE_REMOTE_AGENT="${REMOTE_AGENTS}"
-    bashio::log.info "Agents distants (DOZZLE_REMOTE_AGENT): ${REMOTE_AGENTS}"
-fi
-
+# --- Export env vars used by Dozzle ------------------------------------------
 export DOZZLE_BASE="${DOZZLE_BASE_PATH}"
 export DOZZLE_ADDR="${DOZZLE_ADDR}"
 export DOZZLE_LEVEL="${LOG_LEVEL}"
 export DOZZLE_AUTH_PROVIDER="none"
+
 if bashio::var.true "${NO_ANALYTICS}"; then
     export DOZZLE_NO_ANALYTICS="true"
 fi
 
-if bashio::var.true "${ENABLE_AGENT}"; then
-    bashio::log.info "Démarrage du Dozzle Agent sur 0.0.0.0:${AGENT_PORT}..."
-    if bashio::var.has_value "$(bashio::config 'agent_hostname')"; then
-        AH="$(bashio::config 'agent_hostname')"
-        bashio::log.info "Nom d’hôte agent: ${AH}"
-        env DOZZLE_HOSTNAME="${AH}" /usr/local/bin/dozzle agent --addr "0.0.0.0:${AGENT_PORT}" --level "${LOG_LEVEL}" &
-    else
-        /usr/local/bin/dozzle agent --addr "0.0.0.0:${AGENT_PORT}" --level "${LOG_LEVEL}" &
-    fi
-    sleep 1
+# --- Remote agents -----------------------------------------------------------
+if bashio::var.has_value "${REMOTE_AGENTS}"; then
+    export DOZZLE_REMOTE_AGENT="${REMOTE_AGENTS}"
+    bashio::log.info "Remote agents (DOZZLE_REMOTE_AGENT): ${REMOTE_AGENTS}"
 fi
 
-bashio::log.info "============================================"
-bashio::log.info " Dozzle — UI logs Docker"
-bashio::log.info " Base (Ingress): ${DOZZLE_BASE_PATH}"
-bashio::log.info " Écoute         : ${DOZZLE_ADDR}"
-bashio::log.info " Niveau log     : ${LOG_LEVEL}"
-bashio::log.info " Filtre         : ${FILTER:-aucun}"
-bashio::log.info " Agent intégré  : ${ENABLE_AGENT} (port ${AGENT_PORT})"
-bashio::log.info "============================================"
+# --- Built-in agent (optional) -----------------------------------------------
+if bashio::var.true "${ENABLE_AGENT}"; then
+    bashio::log.info "Starting built-in Dozzle agent on 0.0.0.0:${AGENT_PORT} ..."
+    if bashio::var.has_value "${AGENT_HOSTNAME}"; then
+        bashio::log.info "Agent hostname: ${AGENT_HOSTNAME}"
+        DOZZLE_HOSTNAME="${AGENT_HOSTNAME}" \
+            /usr/local/bin/dozzle agent \
+                --addr "0.0.0.0:${AGENT_PORT}" \
+                --level "${LOG_LEVEL}" &
+    else
+        /usr/local/bin/dozzle agent \
+            --addr "0.0.0.0:${AGENT_PORT}" \
+            --level "${LOG_LEVEL}" &
+    fi
+    sleep 1
+    bashio::log.info "Built-in agent started on port ${AGENT_PORT}"
+fi
 
-bashio::log.info "Commande: /usr/local/bin/dozzle ${DOZZLE_ARGS[*]}"
+# --- Summary -----------------------------------------------------------------
+bashio::log.info "========================================"
+bashio::log.info " Dozzle — Docker log viewer"
+bashio::log.info " Ingress base : ${DOZZLE_BASE_PATH}"
+bashio::log.info " Listen addr  : ${DOZZLE_ADDR}"
+bashio::log.info " Log level    : ${LOG_LEVEL}"
+bashio::log.info " Filter       : ${FILTER:-none}"
+bashio::log.info " Agent        : ${ENABLE_AGENT} (port ${AGENT_PORT})"
+bashio::log.info " Remote agents: ${REMOTE_AGENTS:-none}"
+bashio::log.info "========================================"
+
+bashio::log.info "Command: /usr/local/bin/dozzle ${DOZZLE_ARGS[*]}"
 exec /usr/local/bin/dozzle "${DOZZLE_ARGS[@]}"
