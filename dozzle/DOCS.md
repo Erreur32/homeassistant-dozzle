@@ -4,6 +4,7 @@
 
 ## Prérequis
 
+- **Architectures** : l’image publiée sur GHCR est construite pour **amd64** et **aarch64** uniquement (limite de l’outil de build Home Assistant 2026).
 - **Supervisor** à jour — idéalement **≥ 2026.03.2** (correctifs de sécurité, dont la gestion du réseau pour les apps en `host_network` ; cette image **n’utilise pas** `host_network`).
 - Accès **Docker** accordé par le Supervisor (`docker_api: true` dans le manifest).
 - Home Assistant **2026.2+** recommandé pour l’intégration panel / Ingress côté frontend.
