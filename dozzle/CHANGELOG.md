@@ -6,6 +6,13 @@ A copy also lives at the repository root: [`CHANGELOG.md`](../CHANGELOG.md).
 
 ---
 
+## 0.1.4 — 2026-04-05
+
+- **Fix nginx:** move `client_body_temp_path` / `proxy_temp_path` inside `http {}` block — were incorrectly placed at main context level, causing `directive is not allowed here` fatal error.
+- **Logs:** expose `BUILD_VERSION` and `DOZZLE_VERSION` as runtime env vars (`ENV` in Dockerfile); startup banner now shows app version, Dozzle binary version, ingress URL, proxy layout, and all active options.
+
+---
+
 ## 0.1.3 — 2026-04-05
 
 - **Fix nginx startup:** redirect all temp files to `/tmp` (avoids `Permission denied` on `/var/lib/nginx/tmp`); add `-e /dev/stderr` flag so the compiled-in early log path is never hit.

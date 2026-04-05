@@ -1,5 +1,4 @@
-release: v0.1.3
+release: v0.1.4
 
-- fix(nginx): redirect all temp files to /tmp — avoids permission denied on /var/lib/nginx
-- fix(nginx): add -e /dev/stderr flag so early startup logs don't hit compiled-in path
-- fix(nginx): remove sub_filter_types text/html (duplicate of nginx default — caused warn)
+- fix(nginx): move temp path directives inside http{} block (were at main context — fatal error)
+- feat(logs): BUILD_VERSION + DOZZLE_VERSION exposed as ENV vars, cleaner startup banner

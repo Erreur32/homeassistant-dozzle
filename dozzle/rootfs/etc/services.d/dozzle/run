@@ -1,7 +1,7 @@
 #!/usr/bin/with-contenv bashio
 # ==============================================================================
 # Home Assistant App — Dozzle
-# Ingress  : --base from bashio::addon.ingress_entry
+# Ingress  : nginx on :8080 proxies here (:8081), patches HTML for SPA compat
 # Agent    : optional built-in dozzle agent (enable_agent option)
 # s6-overlay: https://github.com/just-containers/s6-overlay
 # ==============================================================================
@@ -9,7 +9,6 @@
 set -e
 
 declare -a DOZZLE_ARGS
-declare DOZZLE_BASE_PATH
 declare DOZZLE_ADDR
 declare LOG_LEVEL
 declare FILTER
@@ -25,7 +24,7 @@ declare ENABLE_AGENT
 if [ -S /var/run/docker.sock ]; then
     if curl -s --unix-socket /var/run/docker.sock http://localhost/version >/dev/null 2>&1; then
         DOCKER_VERSION="$(curl -s --unix-socket /var/run/docker.sock http://localhost/version | jq -r '.Version')"
-        bashio::log.info "Docker API OK — engine version ${DOCKER_VERSION}"
+        bashio::log.info "Docker API OK — engine ${DOCKER_VERSION}"
     else
         bashio::log.warning "Docker socket found but API is not responding"
     fi
@@ -33,16 +32,11 @@ else
     bashio::log.error "No socket at /var/run/docker.sock — enable docker_api in the manifest"
 fi
 
-# --- Ingress (Supervisor proxy / panel frontend) ------------------------------
-# The Supervisor STRIPS the /api/hassio_ingress/TOKEN prefix before forwarding
-# to the container — the container always receives requests at "/" (ingress_entry: /).
-# Do NOT pass the full ingress token as --base; use "/" (Dozzle default).
+# --- Ingress entry (external URL prefix, stripped by Supervisor before forwarding) --
 INGRESS_ENTRY="$(bashio::addon.ingress_entry)"
-DOZZLE_BASE_PATH="/"
-bashio::log.info "Ingress entry (external): ${INGRESS_ENTRY}"
-bashio::log.info "Dozzle base path (container): ${DOZZLE_BASE_PATH}"
 
-DOZZLE_ADDR=":8081"  # nginx listens on :8080 and proxies here
+# nginx on :8080 → Dozzle on :8081 (internal only)
+DOZZLE_ADDR=":8081"
 
 # --- Read options from HA config ---------------------------------------------
 LOG_LEVEL="$(bashio::config 'log_level' 'info')"
@@ -57,7 +51,7 @@ REMOTE_AGENTS="$(bashio::config 'remote_agents' '')"
 # --- Build Dozzle argument list ----------------------------------------------
 DOZZLE_ARGS=(
     "--addr"  "${DOZZLE_ADDR}"
-    "--base"  "${DOZZLE_BASE_PATH}"
+    "--base"  "/"
     "--level" "${LOG_LEVEL}"
     "--auth-provider" "none"
 )
@@ -68,17 +62,15 @@ fi
 
 if bashio::var.has_value "${FILTER}"; then
     DOZZLE_ARGS+=("--filter" "${FILTER}")
-    bashio::log.info "Container filter: ${FILTER}"
 fi
 
 if bashio::var.true "${ENABLE_ACTIONS}"; then
     DOZZLE_ARGS+=("--enable-actions")
-    bashio::log.info "Container actions (restart/stop) enabled"
 fi
 
 # --- Export env vars used by Dozzle ------------------------------------------
-export DOZZLE_BASE="${DOZZLE_BASE_PATH}"
-export DOZZLE_ADDR="${DOZZLE_ADDR}"  # nginx :8080 → Dozzle :8081
+export DOZZLE_BASE="/"
+export DOZZLE_ADDR="${DOZZLE_ADDR}"
 export DOZZLE_LEVEL="${LOG_LEVEL}"
 export DOZZLE_AUTH_PROVIDER="none"
 
@@ -86,17 +78,14 @@ if bashio::var.true "${NO_ANALYTICS}"; then
     export DOZZLE_NO_ANALYTICS="true"
 fi
 
-# --- Remote agents -----------------------------------------------------------
 if bashio::var.has_value "${REMOTE_AGENTS}"; then
     export DOZZLE_REMOTE_AGENT="${REMOTE_AGENTS}"
-    bashio::log.info "Remote agents (DOZZLE_REMOTE_AGENT): ${REMOTE_AGENTS}"
 fi
 
 # --- Built-in agent (optional) -----------------------------------------------
 if bashio::var.true "${ENABLE_AGENT}"; then
     bashio::log.info "Starting built-in Dozzle agent on 0.0.0.0:${AGENT_PORT} ..."
     if bashio::var.has_value "${AGENT_HOSTNAME}"; then
-        bashio::log.info "Agent hostname: ${AGENT_HOSTNAME}"
         DOZZLE_HOSTNAME="${AGENT_HOSTNAME}" \
             /usr/local/bin/dozzle agent \
                 --addr "0.0.0.0:${AGENT_PORT}" \
@@ -107,19 +96,23 @@ if bashio::var.true "${ENABLE_AGENT}"; then
             --level "${LOG_LEVEL}" &
     fi
     sleep 1
-    bashio::log.info "Built-in agent started on port ${AGENT_PORT}"
+    bashio::log.info "Built-in agent ready on port ${AGENT_PORT}"
 fi
 
-# --- Summary -----------------------------------------------------------------
-bashio::log.info "========================================"
-bashio::log.info " Dozzle — Docker log viewer"
-bashio::log.info " Ingress base : ${DOZZLE_BASE_PATH}"
-bashio::log.info " Listen addr  : ${DOZZLE_ADDR}"
-bashio::log.info " Log level    : ${LOG_LEVEL}"
-bashio::log.info " Filter       : ${FILTER:-none}"
-bashio::log.info " Agent        : ${ENABLE_AGENT} (port ${AGENT_PORT})"
-bashio::log.info " Remote agents: ${REMOTE_AGENTS:-none}"
-bashio::log.info "========================================"
+# --- Startup banner ----------------------------------------------------------
+bashio::log.info "================================================"
+bashio::log.info "  Dozzle for Home Assistant"
+bashio::log.info "  App version  : ${BUILD_VERSION:-unknown}"
+bashio::log.info "  Dozzle binary: ${DOZZLE_VERSION:-unknown}"
+bashio::log.info "------------------------------------------------"
+bashio::log.info "  Ingress (ext): ${INGRESS_ENTRY}"
+bashio::log.info "  nginx proxy  : :8080  →  Dozzle :8081"
+bashio::log.info "  Log level    : ${LOG_LEVEL}"
+bashio::log.info "  Filter       : ${FILTER:-none}"
+bashio::log.info "  Actions      : ${ENABLE_ACTIONS}"
+bashio::log.info "  Agent        : ${ENABLE_AGENT} (port ${AGENT_PORT})"
+bashio::log.info "  Remote agents: ${REMOTE_AGENTS:-none}"
+bashio::log.info "================================================"
+bashio::log.info "CMD: /usr/local/bin/dozzle ${DOZZLE_ARGS[*]}"
 
-bashio::log.info "Command: /usr/local/bin/dozzle ${DOZZLE_ARGS[*]}"
 exec /usr/local/bin/dozzle "${DOZZLE_ARGS[@]}"
