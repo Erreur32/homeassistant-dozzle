@@ -2,10 +2,12 @@
 # https://developers.home-assistant.io/docs/apps/configuration#app-dockerfile
 # https://developers.home-assistant.io/blog/2026/04/02/builder-migration
 
+# Global ARGs — must be declared before any FROM to be usable in FROM instructions
+ARG BUILD_FROM=ghcr.io/home-assistant/base:3.23
 ARG DOZZLE_VERSION=10.0.6
+
 FROM amir20/dozzle:${DOZZLE_VERSION} AS dozzle_upstream
 
-ARG BUILD_FROM=ghcr.io/home-assistant/base:3.23
 FROM ${BUILD_FROM}
 
 ARG BUILD_VERSION=0.0.7
