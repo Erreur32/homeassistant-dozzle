@@ -7,10 +7,12 @@
 # Updated files:
 #   1. dozzle/config.yaml     — version (manifest Supervisor / store)
 #   2. dozzle/Dockerfile      — ARG BUILD_VERSION (default image label / local builds)
-#
-# Optional (if present):
-#   3. README.md              — shields.io style version-vX.Y.Z-blue
-#   4. dozzle/README.md       — same pattern if badge exists
+#   3. README.md (root)       — always, if present:
+#        • [release-shield] / version-vCURRENT-blue → NEW (reference links at file bottom)
+#        • releases/tag/vCURRENT → vNEW
+#        • `CURRENT` → `NEW` in backticks (About table: packaged app version)
+#        • line "Bundled Dozzle binary" → backticks set from ARG DOZZLE_VERSION in Dockerfile
+#   4. dozzle/README.md       — same badge/link patterns as (3), if those lines exist
 #
 # Commit message file (edit before committing):
 #   5. commit-message.txt     — git commit -F commit-message.txt
@@ -21,8 +23,9 @@
 #                commit-message.txt est complété avec « release: v<NEW> » si besoin.
 #
 # Not auto-updated (do manually):
-#   - dozzle/CHANGELOG.md
-#   - ARG DOZZLE_VERSION in Dockerfile (upstream Dozzle binary — separate concern)
+#   - dozzle/CHANGELOG.md (release notes)
+#   - ARG DOZZLE_VERSION in Dockerfile (bump upstream Dozzle binary separately; README
+#     "Bundled Dozzle binary" row is synced FROM Dockerfile on each app version bump)
 # ──────────────────────────────────────────────────────────────────────────────
 
 set -e
@@ -99,7 +102,6 @@ sedi() {
   sed -i.bak "$@" "$file" && rm -f "${file}.bak"
 }
 
-SEMVER_PATTERN='[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*'
 CURRENT_ESC=$(echo "$CURRENT" | sed 's/\./\\./g')
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -135,24 +137,41 @@ if [ "$NEW" != "$CURRENT" ]; then
     echo -e "  ${RED}✗${R} dozzle/Dockerfile         ${RED}(missing)${R}"
   fi
 
-  # 3. README.md (root) — shields badge
-  if [ -f "$ROOT_README" ] && grep -q "version-v${SEMVER_PATTERN}-blue" "$ROOT_README" 2>/dev/null; then
-    sedi "$ROOT_README" "s/version-v${SEMVER_PATTERN}-blue/version-v${NEW}-blue/g"
-    sedi "$ROOT_README" "s|releases/tag/v${SEMVER_PATTERN}|releases/tag/v${NEW}|g"
+  # 3. README.md (root) — release badge / tag URL / About table (exact CURRENT → NEW)
+  #     Reference-style shields: [release-shield]: .../version-v0.0.1-blue.svg — no grep gate
+  if [ -f "$ROOT_README" ]; then
+    if grep -q "version-v${CURRENT_ESC}-blue" "$ROOT_README" 2>/dev/null; then
+      sedi "$ROOT_README" "s/version-v${CURRENT_ESC}-blue/version-v${NEW}-blue/g"
+    fi
+    if grep -q "releases/tag/v${CURRENT_ESC}" "$ROOT_README" 2>/dev/null; then
+      sedi "$ROOT_README" "s|releases/tag/v${CURRENT_ESC}|releases/tag/v${NEW}|g"
+    fi
+    # Packaged app version (About table): `CURRENT` → `NEW` wherever that exact semver appears in backticks
     sedi "$ROOT_README" "s/\`${CURRENT_ESC}\`/\`${NEW}\`/g"
-    echo -e "  ${G}✓${R} README.md                 ${C}(badge / links)${R}"
-  elif [ -f "$ROOT_README" ]; then
-    echo -e "  ${Y}○${R} README.md                 ${Y}(no version-v*-blue badge)${R}"
+    # Bundled Dozzle binary — mirror ARG DOZZLE_VERSION from Dockerfile (first `...` on that line)
+    if [ -f "$DOCKERFILE" ]; then
+      DOZZLE_VER=$(grep -E '^ARG DOZZLE_VERSION=' "$DOCKERFILE" | head -1 | sed 's/^ARG DOZZLE_VERSION=//')
+      if [ -n "$DOZZLE_VER" ] && grep -q 'Bundled Dozzle binary' "$ROOT_README" 2>/dev/null; then
+        sedi "$ROOT_README" "/Bundled Dozzle binary/s/\`[^\`]*\`/\`${DOZZLE_VER}\`/"
+      fi
+    fi
+    echo -e "  ${G}✓${R} README.md                 ${C}(release badge, tag URL, app + bundled versions)${R}"
   else
     echo -e "  ${Y}○${R} README.md                 ${Y}(not found)${R}"
   fi
 
-  # 4. dozzle/README.md
-  if [ -f "$DOZZLE_README" ] && grep -q "version-v${SEMVER_PATTERN}-blue" "$DOZZLE_README" 2>/dev/null; then
-    sedi "$DOZZLE_README" "s/version-v${SEMVER_PATTERN}-blue/version-v${NEW}-blue/g"
-    echo -e "  ${G}✓${R} dozzle/README.md          ${C}(badge)${R}"
-  elif [ -f "$DOZZLE_README" ]; then
-    echo -e "  ${Y}○${R} dozzle/README.md          ${Y}(no badge pattern)${R}"
+  # 4. dozzle/README.md — same semver replacements if those strings exist
+  if [ -f "$DOZZLE_README" ]; then
+    if grep -q "version-v${CURRENT_ESC}-blue" "$DOZZLE_README" 2>/dev/null; then
+      sedi "$DOZZLE_README" "s/version-v${CURRENT_ESC}-blue/version-v${NEW}-blue/g"
+    fi
+    if grep -q "releases/tag/v${CURRENT_ESC}" "$DOZZLE_README" 2>/dev/null; then
+      sedi "$DOZZLE_README" "s|releases/tag/v${CURRENT_ESC}|releases/tag/v${NEW}|g"
+    fi
+    if grep -q "\`${CURRENT_ESC}\`" "$DOZZLE_README" 2>/dev/null; then
+      sedi "$DOZZLE_README" "s/\`${CURRENT_ESC}\`/\`${NEW}\`/g"
+    fi
+    echo -e "  ${G}✓${R} dozzle/README.md          ${C}(checked)${R}"
   else
     echo -e "  ${Y}○${R} dozzle/README.md          ${Y}(not found)${R}"
   fi

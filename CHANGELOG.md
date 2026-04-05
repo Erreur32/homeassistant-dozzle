@@ -2,15 +2,13 @@
 
 All notable changes to this repository ([homeassistant-dozzle](https://github.com/Erreur32/homeassistant-dozzle)) are documented here. Older **0.2.x** packaging lines are not carried over.
 
-A copy also lives at the repository root: [`CHANGELOG.md`](../CHANGELOG.md).
-
 ---
 
 ## 0.0.4 — 2026-04-05
 
-- **Documentation (English):** repository [`README.md`](../README.md), [`dozzle/README.md`](README.md), [`DOCS.md`](DOCS.md) — clearer structure (tables, sections), shield badges and My Home Assistant add-repo flow; IMPORTANT block corrected (full Dozzle web UI + Ingress, not the agent-only add-on).
-- **Tooling:** [`update_version.sh`](../update_version.sh) updates root `README.md` on each bump: `[release-shield]` / `version-vX.Y.Z-blue`, GitHub `releases/tag/vX.Y.Z` URL, and `` `semver` `` for the packaged app version from `config.yaml`; the **Bundled Dozzle binary** table row is synced from `ARG DOZZLE_VERSION` in `Dockerfile`.
-- **Project:** [`CHANGELOG.md`](../CHANGELOG.md) at the repository root; this file updated in parallel for app-folder links.
+- **Documentation (English):** root [`README.md`](README.md), [`dozzle/README.md`](dozzle/README.md), [`dozzle/DOCS.md`](dozzle/DOCS.md) — clearer structure (tables, sections), shield badges and My Home Assistant add-repo flow; IMPORTANT block corrected (full Dozzle web UI + Ingress, not the agent-only add-on).
+- **Tooling:** [`update_version.sh`](update_version.sh) updates root `README.md` on each bump: `[release-shield]` / `version-vX.Y.Z-blue`, GitHub `releases/tag/vX.Y.Z` URL, and `` `semver` `` for the packaged app version from `dozzle/config.yaml`; the **Bundled Dozzle binary** table row is synced from `ARG DOZZLE_VERSION` in `dozzle/Dockerfile`.
+- **Project:** this file at the repository root; [`dozzle/CHANGELOG.md`](dozzle/CHANGELOG.md) kept in sync for the app folder and existing doc links.
 
 ---
 

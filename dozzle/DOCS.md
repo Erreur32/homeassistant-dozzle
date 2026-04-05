@@ -1,57 +1,101 @@
-# Dozzle — App Home Assistant
+# Dozzle — Home Assistant App
 
-[Dozzle](https://github.com/amir20/dozzle) affiche les journaux Docker en direct. Cette app s’ouvre depuis **Paramètres → Apps** (anciennement add-ons) et dans le menu latéral grâce à **Ingress**.
+[Dozzle](https://github.com/amir20/dozzle) streams Docker container logs in real time. This app opens from **Settings → Apps** and the **sidebar** via **Ingress**.
 
-## Prérequis
+---
 
-- **Architectures** : l’image publiée sur GHCR est construite pour **amd64** et **aarch64** uniquement (limite de l’outil de build Home Assistant 2026).
-- **Supervisor** à jour — idéalement **≥ 2026.03.2** (correctifs de sécurité, dont la gestion du réseau pour les apps en `host_network` ; cette image **n’utilise pas** `host_network`).
-- Accès **Docker** accordé par le Supervisor (`docker_api: true` dans le manifest).
-- Home Assistant **2026.2+** recommandé pour l’intégration panel / Ingress côté frontend.
+## Table of contents
 
-## Utilisation
+1. [Requirements](#requirements)
+2. [Getting started](#getting-started)
+3. [Configuration options](#configuration-options)
+4. [Ports](#ports)
+5. [Authentication](#authentication)
+6. [Supervisor communication](#supervisor-communication)
+7. [Build & publish (2026)](#build--publish-2026)
+8. [Troubleshooting](#troubleshooting)
 
-1. Installez l’app depuis votre dépôt d’apps.
-2. Démarrez-la ; ouvrez **Dozzle** depuis le menu (Ingress).
-3. Optionnel : mappez le port **8080** pour un accès direct sans passer par Ingress.
+---
 
-## Options
+## Requirements
 
-| Option | Rôle |
-|--------|------|
-| `log_level` | Verbosité des logs du processus Dozzle. |
-| `filter` | Filtre Docker (comme `docker ps --filter`). |
-| `no_analytics` | Désactive les statistiques anonymes Dozzle. |
-| `enable_actions` | Autorise redémarrage / arrêt depuis l’UI. |
-| `enable_agent` | Lance **dozzle agent** dans le même conteneur. |
-| `agent_port` | Port d’écoute de l’agent (défaut 7007). |
-| `agent_hostname` | Nom affiché pour cet agent. |
-| `remote_agents` | Liste `hôte:port,hôte:port` → variable `DOZZLE_REMOTE_AGENT`. |
+| Topic | Details |
+| --- | --- |
+| **Architectures** | Images published to GHCR are built for **amd64** and **aarch64** (Home Assistant builder `prepare-multi-arch-matrix`). Other arches may be listed in the manifest for local builds; CI targets these two. |
+| **Supervisor** | Prefer **≥ 2026.03.2** (security fixes, including networking for apps using `host_network` — **this image does not use `host_network`**). |
+| **Docker access** | Required: Supervisor grants Docker API access (`docker_api: true` in the manifest). |
+| **Home Assistant** | **2026.2+** recommended for panel / Ingress behaviour. |
 
-Si **Agent intégré** est activé, mappez le port **7007/tcp** vers l’hôte pour joindre l’agent depuis une autre instance Dozzle.
+---
 
-## Authentification
+## Getting started
 
-L’UI est servie via **Ingress** : l’accès est celui de Home Assistant (`auth_api`). Dozzle est lancé avec `--auth-provider none`.
+1. Add the [app repository](https://github.com/Erreur32/homeassistant-dozzle) and install **Dozzle** from the App Store.
+2. **Start** the app; open **Dozzle** from the sidebar (Ingress).
+3. **Optional:** map host port **8080** for direct access without Ingress.
 
-## Communication avec le Supervisor
+---
 
-- API Supervisor : `http://supervisor/` avec le jeton `SUPERVISOR_TOKEN` (injecté automatiquement).
-- Documentation : [Apps — communication](https://developers.home-assistant.io/docs/apps/communication).
+## Configuration options
 
-## Build (2026)
+| Option | Role |
+| --- | --- |
+| `log_level` | Verbosity of the Dozzle process logs (`trace` … `fatal`). |
+| `filter` | Docker filter string (same idea as `docker ps --filter`). |
+| `no_analytics` | When enabled, disables anonymous Dozzle analytics. |
+| `enable_actions` | When enabled, allows restart/stop actions from the UI — use with care. |
+| `enable_agent` | Runs **dozzle agent** inside the same container. |
+| `agent_port` | Agent listen port (default **7007**). |
+| `agent_hostname` | Display name for this agent in remote UIs. |
+| `remote_agents` | Comma-separated `host:port` list → passed to Dozzle as `DOZZLE_REMOTE_AGENT`. |
 
-Le fichier **`build.yaml` n’est plus nécessaire** : la base d’image et les labels sont définis dans le **Dockerfile** (BuildKit / [migration builder avril 2026](https://developers.home-assistant.io/blog/2026/04/02/builder-migration)).
+If the embedded agent is enabled, map **7007/tcp** on the host so other Dozzle instances can reach it.
 
-### Publication GitHub (GHCR)
+---
 
-Le dépôt inclut **`.github/workflows/builder.yaml`** (tout le pipeline : prepare / build / manifest) avec les actions **`home-assistant/builder@2026.03.2`**. Sur **push** vers `main`, les images sont poussées vers l’URL de la clé **`image`** dans `config.yaml` (par défaut `ghcr.io/erreur32/homeassistant-dozzle`). Le package GHCR doit être **lié au dépôt** [Erreur32/homeassistant-dozzle](https://github.com/Erreur32/homeassistant-dozzle) avec **`packages: write`** pour le `GITHUB_TOKEN`.
+## Ports
 
-### Build local sur l’hôte HA
+| Port | Purpose |
+| --- | --- |
+| **8080** | Web UI (optional direct mapping; Ingress uses this internally). |
+| **7007** | Embedded Dozzle agent — map only if `enable_agent` is on and you need remote access. |
 
-Si vous ne publiez pas sur GHCR, supprimez la ligne **`image:`** du manifest pour que le Supervisor construise l’image à partir du `Dockerfile`.
+---
 
-## Dépannage
+## Authentication
 
-- Page blanche ou WebSocket cassé : vérifiez que **`ingress_stream: true`** est bien présent dans le manifest.
-- Pas de conteneurs : vérifiez le socket Docker et les droits `docker_api`.
+The UI is served through **Ingress**; access follows Home Assistant session rules (`auth_api`). Dozzle is started with `--auth-provider none` because the edge is Home Assistant, not a public Dozzle login.
+
+---
+
+## Supervisor communication
+
+- Supervisor API base: `http://supervisor/` with token **`SUPERVISOR_TOKEN`** (injected automatically).
+- Docs: [Apps — communication](https://developers.home-assistant.io/docs/apps/communication).
+
+---
+
+## Build & publish (2026)
+
+### Dockerfile as source of truth
+
+**`build.yaml` is not required.** Base image and OCI labels are defined in the **Dockerfile** (BuildKit). See [Builder migration (April 2026)](https://developers.home-assistant.io/blog/2026/04/02/builder-migration).
+
+### GitHub Actions → GHCR
+
+The repo includes **`.github/workflows/builder.yaml`** (prepare / build / manifest) using **`home-assistant/builder@2026.03.2`**. On push to `main`, images are pushed to the registry URL in the manifest’s **`image`** key (default `ghcr.io/erreur32/homeassistant-dozzle`). Link the GHCR package to [Erreur32/homeassistant-dozzle](https://github.com/Erreur32/homeassistant-dozzle) and grant **`packages: write`** for `GITHUB_TOKEN`.
+
+### Local build on the HA host
+
+If you do not pull from GHCR, remove the **`image:`** line from the manifest so the Supervisor builds from the local `Dockerfile`.
+
+---
+
+## Troubleshooting
+
+| Symptom | What to check |
+| --- | --- |
+| Blank page or broken WebSocket | Confirm **`ingress_stream: true`** in the app manifest. |
+| No containers listed | Docker socket / `docker_api` permissions and Supervisor health. |
+
+For release history, see [`CHANGELOG.md`](CHANGELOG.md).

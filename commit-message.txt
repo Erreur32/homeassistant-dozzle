@@ -1,8 +1,5 @@
-release: v0.0.3
+release: v0.0.4
 
-release: v0.0.2
-
-release: v0.2.2
-
-- <change 1>
-- <change 2>
+- English documentation and layout: README, dozzle/README, dozzle/DOCS; IMPORTANT block (full UI vs agent-only).
+- update_version.sh: sync README release badge, release tag URL, packaged semver; bundled Dozzle from Dockerfile ARG.
+- CHANGELOG.md at repo root; dozzle/CHANGELOG.md aligned for v0.0.4.

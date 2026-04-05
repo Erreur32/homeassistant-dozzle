@@ -2,7 +2,7 @@
 # https://developers.home-assistant.io/docs/apps/configuration
 # Ne pas utiliser la clé `advanced` (dépréciée Supervisor 2026.03.0).
 name: "Dozzle"
-version: "0.0.3"
+version: "0.0.4"
 slug: "dozzle"
 description: "Visionneur de logs Docker en temps réel (Ingress, agent optionnel)"
 # Page du projet (support / source de l’app packagée pour HA)
