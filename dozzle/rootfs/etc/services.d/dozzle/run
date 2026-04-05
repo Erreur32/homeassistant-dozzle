@@ -1,9 +1,10 @@
 #!/usr/bin/with-contenv bashio
 # ==============================================================================
 # Home Assistant App — Dozzle
-# Ingress  : nginx on :8080 proxies here (:8081), patches HTML for SPA compat
-# Agent    : optional built-in dozzle agent (enable_agent option)
-# s6-overlay: https://github.com/just-containers/s6-overlay
+# Ingress: nginx on :8080 adds back /api/hassio_ingress/TOKEN prefix,
+#          Dozzle on :8081 runs with --base TOKEN_PATH so all asset/API
+#          URLs are correctly scoped to the Ingress URL.
+# Agent:   optional built-in dozzle agent on port 7007 (enable_agent option)
 # ==============================================================================
 
 set -e
@@ -16,8 +17,6 @@ declare NO_ANALYTICS
 declare ENABLE_ACTIONS
 declare INGRESS_ENTRY
 declare REMOTE_AGENTS
-declare AGENT_PORT
-declare AGENT_HOSTNAME
 declare ENABLE_AGENT
 
 # --- Docker socket (docker_api: true in config.yaml) -------------------------
@@ -32,7 +31,10 @@ else
     bashio::log.error "No socket at /var/run/docker.sock — enable docker_api in the manifest"
 fi
 
-# --- Ingress entry (external URL prefix, stripped by Supervisor before forwarding) --
+# --- Ingress base path -------------------------------------------------------
+# Supervisor STRIPS /api/hassio_ingress/TOKEN before forwarding to the container.
+# We pass the full token path as --base so Dozzle embeds it in all asset/API URLs.
+# nginx adds the prefix back (dozzle.conf rewrite rule).
 INGRESS_ENTRY="$(bashio::addon.ingress_entry)"
 
 # nginx on :8080 → Dozzle on :8081 (internal only)
@@ -44,15 +46,13 @@ FILTER="$(bashio::config 'filter' '')"
 NO_ANALYTICS="$(bashio::config 'no_analytics' 'true')"
 ENABLE_ACTIONS="$(bashio::config 'enable_actions' 'false')"
 ENABLE_AGENT="$(bashio::config 'enable_agent' 'false')"
-AGENT_PORT="$(bashio::config 'agent_port' '7007')"
-AGENT_HOSTNAME="$(bashio::config 'agent_hostname' '')"
 REMOTE_AGENTS="$(bashio::config 'remote_agents' '')"
 
 # --- Build Dozzle argument list ----------------------------------------------
 DOZZLE_ARGS=(
-    "--addr"  "${DOZZLE_ADDR}"
-    "--base"  "/"
-    "--level" "${LOG_LEVEL}"
+    "--addr"          "${DOZZLE_ADDR}"
+    "--base"          "${INGRESS_ENTRY}"
+    "--level"         "${LOG_LEVEL}"
     "--auth-provider" "none"
 )
 
@@ -69,7 +69,7 @@ if bashio::var.true "${ENABLE_ACTIONS}"; then
 fi
 
 # --- Export env vars used by Dozzle ------------------------------------------
-export DOZZLE_BASE="/"
+export DOZZLE_BASE="${INGRESS_ENTRY}"
 export DOZZLE_ADDR="${DOZZLE_ADDR}"
 export DOZZLE_LEVEL="${LOG_LEVEL}"
 export DOZZLE_AUTH_PROVIDER="none"
@@ -82,21 +82,15 @@ if bashio::var.has_value "${REMOTE_AGENTS}"; then
     export DOZZLE_REMOTE_AGENT="${REMOTE_AGENTS}"
 fi
 
-# --- Built-in agent (optional) -----------------------------------------------
+# --- Built-in agent (optional, port 7007) ------------------------------------
+# This exposes HA's Docker to OTHER Dozzle instances on your network.
+# Map port 7007 in the Network tab to make it reachable from outside.
+# You do NOT need this to see HA containers in this add-on.
 if bashio::var.true "${ENABLE_AGENT}"; then
-    bashio::log.info "Starting built-in Dozzle agent on 0.0.0.0:${AGENT_PORT} ..."
-    if bashio::var.has_value "${AGENT_HOSTNAME}"; then
-        DOZZLE_HOSTNAME="${AGENT_HOSTNAME}" \
-            /usr/local/bin/dozzle agent \
-                --addr "0.0.0.0:${AGENT_PORT}" \
-                --level "${LOG_LEVEL}" &
-    else
-        /usr/local/bin/dozzle agent \
-            --addr "0.0.0.0:${AGENT_PORT}" \
-            --level "${LOG_LEVEL}" &
-    fi
+    bashio::log.info "Starting built-in agent on 0.0.0.0:7007 (map port 7007 in Network tab)"
+    /usr/local/bin/dozzle agent --addr "0.0.0.0:7007" --level "${LOG_LEVEL}" &
     sleep 1
-    bashio::log.info "Built-in agent ready on port ${AGENT_PORT}"
+    bashio::log.info "Built-in agent ready on port 7007"
 fi
 
 # --- Startup banner ----------------------------------------------------------
@@ -105,14 +99,13 @@ bashio::log.info "  Dozzle for Home Assistant"
 bashio::log.info "  App version  : ${BUILD_VERSION:-unknown}"
 bashio::log.info "  Dozzle binary: ${DOZZLE_VERSION:-unknown}"
 bashio::log.info "------------------------------------------------"
-bashio::log.info "  Ingress (ext): ${INGRESS_ENTRY}"
-bashio::log.info "  nginx proxy  : :8080  →  Dozzle :8081"
+bashio::log.info "  Ingress base : ${INGRESS_ENTRY}"
+bashio::log.info "  Listen addr  : ${DOZZLE_ADDR} (nginx :8080 → here)"
 bashio::log.info "  Log level    : ${LOG_LEVEL}"
 bashio::log.info "  Filter       : ${FILTER:-none}"
 bashio::log.info "  Actions      : ${ENABLE_ACTIONS}"
-bashio::log.info "  Agent        : ${ENABLE_AGENT} (port ${AGENT_PORT})"
+bashio::log.info "  Agent        : ${ENABLE_AGENT} (port 7007)"
 bashio::log.info "  Remote agents: ${REMOTE_AGENTS:-none}"
 bashio::log.info "================================================"
-bashio::log.info "CMD: /usr/local/bin/dozzle ${DOZZLE_ARGS[*]}"
 
 exec /usr/local/bin/dozzle "${DOZZLE_ARGS[@]}"

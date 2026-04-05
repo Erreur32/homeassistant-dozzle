@@ -6,6 +6,14 @@ A copy also lives at the repository root: [`CHANGELOG.md`](../CHANGELOG.md).
 
 ---
 
+## 0.1.5 — 2026-04-06
+
+- **Fix Ingress (blank page):** use Dozzle's native `--base` flag with the full ingress token path instead of nginx `sub_filter`. Dozzle rewrites all asset and API URLs to include the token; nginx adds the prefix back (Supervisor strips it before forwarding). No HTML patching needed.
+- **Fix nginx 502:** add wait loop in nginx startup — nginx now waits for Dozzle (:8081) to accept connections before starting.
+- **Simplify agent config:** remove `agent_port` and `agent_hostname` options (port 7007 is hardcoded, hostname label was rarely useful). Updated option descriptions to make the difference between Built-in agent (expose HA outward) and Remote agents (pull in other hosts) explicit.
+
+---
+
 ## 0.1.4 — 2026-04-05
 
 - **Fix nginx:** move `client_body_temp_path` / `proxy_temp_path` inside `http {}` block — were incorrectly placed at main context level, causing `directive is not allowed here` fatal error.

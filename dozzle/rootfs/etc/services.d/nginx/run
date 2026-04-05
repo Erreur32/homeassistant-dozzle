@@ -2,14 +2,28 @@
 # ==============================================================================
 # nginx — reverse proxy in front of Dozzle
 # Listens on :8080 (Ingress-facing), forwards to Dozzle on :8081.
-# Patches HTML responses so the SPA loads correctly through HA Ingress:
-#   • /assets/ → ./assets/   (absolute → relative paths)
-#   • JS shim injected in <head> (rewrites fetch/XHR/WebSocket at runtime)
+#
+# Key: Supervisor STRIPS /api/hassio_ingress/TOKEN before forwarding.
+#      Dozzle runs with --base TOKEN_PATH so asset/API URLs in the HTML embed
+#      the full token path. nginx adds the prefix back so Dozzle sees it.
 # ==============================================================================
 
-# Create temp dirs nginx needs (all under /tmp — always writable)
+INGRESS_ENTRY="$(bashio::addon.ingress_entry)"
+
+# Inject the actual ingress base path into the nginx config template
+sed -i "s|__INGRESS_BASE__|${INGRESS_ENTRY}|g" /etc/nginx/http.d/dozzle.conf
+
 mkdir -p /tmp/nginx_client /tmp/nginx_proxy
 
-bashio::log.info "nginx: starting on :8080 (→ Dozzle :8081)"
-# -e /dev/stderr: redirect early startup log before config is parsed
+bashio::log.info "nginx: ingress base = ${INGRESS_ENTRY}"
+bashio::log.info "nginx: :8080  rewrite → Dozzle :8081${INGRESS_ENTRY}"
+
+# Wait for Dozzle to accept connections before nginx starts
+bashio::log.info "nginx: waiting for Dozzle on :8081..."
+for i in $(seq 1 30); do
+    curl -s --max-time 1 -o /dev/null http://127.0.0.1:8081/ 2>/dev/null && break || true
+    sleep 1
+done
+bashio::log.info "nginx: Dozzle ready — starting proxy"
+
 exec nginx -g 'daemon off;' -e /dev/stderr

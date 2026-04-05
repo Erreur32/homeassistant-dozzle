@@ -17,7 +17,7 @@
 
 | | |
 |---|---|
-| **Version** | `0.1.4` |
+| **Version** | `0.1.5` |
 | **Dozzle binary** | `v10.2.1` |
 | **Architectures** | `amd64` · `aarch64` |
 | **Image** | `ghcr.io/erreur32/homeassistant-dozzle` |
@@ -38,8 +38,8 @@ Full documentation: [`DOCS.md`](DOCS.md) · Release history: [`CHANGELOG.md`](CH
 
 ---
 
-[release-shield]: https://img.shields.io/badge/version-v0.1.4-blue.svg
-[release]: https://github.com/Erreur32/homeassistant-dozzle/releases/tag/v0.1.4
+[release-shield]: https://img.shields.io/badge/version-v0.1.5-blue.svg
+[release]: https://github.com/Erreur32/homeassistant-dozzle/releases/tag/v0.1.5
 [project-stage-shield]: https://img.shields.io/badge/project%20stage-stable-green.svg
 [maintenance-shield]: https://img.shields.io/maintenance/yes/2026.svg
 [license-shield]: https://img.shields.io/badge/license-MIT-blue.svg

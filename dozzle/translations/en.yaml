@@ -1,6 +1,6 @@
 network:
-  8080/tcp: "Optional direct access to the web UI (Ingress is the default)."
-  7007/tcp: "Dozzle agent — map only when Built-in agent is enabled."
+  8080/tcp: "Direct access to the web UI — optional (Ingress sidebar is the default)."
+  7007/tcp: "Dozzle agent port — map this only when 'Built-in agent' option is enabled."
 
 configuration:
   log_level:
@@ -16,14 +16,16 @@ configuration:
     name: Container actions
     description: Allow restart/stop from the UI (use with care).
   enable_agent:
-    name: Built-in agent
-    description: Runs “dozzle agent” so other Dozzle instances can attach to this host (map the agent host port when needed).
-  agent_port:
-    name: Agent port
-    description: Listen port for the agent (default 7007). Map it in the add-on network settings for external access.
-  agent_hostname:
-    name: Agent display name
-    description: Optional label for this agent in remote Dozzle UIs.
+    name: "Built-in agent (expose HA to remote Dozzle)"
+    description: >
+      Starts a Dozzle agent on port 7007 so that another Dozzle instance
+      running on a different host can connect here and display HA containers.
+      This is the OUTGOING direction: map port 7007 in the Network tab to
+      make it reachable from outside. You do NOT need this to see HA containers
+      in this add-on — they are always visible via the Docker socket.
   remote_agents:
-    name: Remote agents
-    description: Comma-separated host:port list to show containers from other hosts (e.g. 192.168.1.10:7007).
+    name: "Remote agents (other hosts → this Dozzle)"
+    description: >
+      Comma-separated host:port list of Dozzle agents running on OTHER hosts
+      whose containers you want to see here (e.g. 192.168.1.10:7007).
+      Leave empty to monitor only this HA host.

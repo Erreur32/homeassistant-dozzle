@@ -1,4 +1,6 @@
-release: v0.1.4
+release: v0.1.5
 
-- fix(nginx): move temp path directives inside http{} block (were at main context — fatal error)
-- feat(logs): BUILD_VERSION + DOZZLE_VERSION exposed as ENV vars, cleaner startup banner
+- fix(ingress): use --base TOKEN_PATH + nginx rewrite instead of sub_filter
+- fix(nginx): wait loop — nginx starts only after Dozzle :8081 is ready
+- fix(agent): remove agent_port/agent_hostname options, hardcode 7007
+- docs(agent): clear descriptions — built-in agent vs remote agents
