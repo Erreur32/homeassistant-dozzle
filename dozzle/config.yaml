@@ -2,7 +2,7 @@
 # https://developers.home-assistant.io/docs/apps/configuration
 # Ne pas utiliser la clé `advanced` (dépréciée Supervisor 2026.03.0).
 name: "Dozzle"
-version: "0.0.5"
+version: "0.0.6"
 slug: "dozzle"
 description: "Visionneur de logs Docker en temps réel (Ingress, agent optionnel)"
 # Page du projet (support / source de l’app packagée pour HA)
@@ -15,8 +15,6 @@ image: ghcr.io/erreur32/homeassistant-dozzle
 arch:
   - amd64
   - aarch64
-  - armv7
-  - i386
 
 startup: services
 init: false
@@ -32,7 +30,6 @@ ingress_stream: true
 
 panel_title: "Dozzle"
 panel_icon: "mdi:text-box-search-outline"
-panel_admin: true
 
 watchdog: "http://[HOST]:[PORT:8080]/"
 

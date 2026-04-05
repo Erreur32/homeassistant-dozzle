@@ -1,4 +1,4 @@
-release: v0.0.5
+release: v0.0.6
 
-- CI fix: remove .github/workflows/docker-image.yml (no Dockerfile at repo root, caused build errors on every push)
-- builder.yaml is the only workflow needed
+- arch: amd64 + aarch64 only (armv7/i386 removed — not built by CI, would cause broken installs)
+- remove panel_admin (undocumented key in HA 2026 spec)
