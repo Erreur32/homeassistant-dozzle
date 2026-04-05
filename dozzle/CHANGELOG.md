@@ -6,6 +6,12 @@ A copy also lives at the repository root: [`CHANGELOG.md`](../CHANGELOG.md).
 
 ---
 
+## 0.1.6 — 2026-04-06
+
+- **Restore `agent_hostname`** option (removed by mistake in 0.1.5) — sets the display name for the built-in agent as seen by remote Dozzle UIs.
+
+---
+
 ## 0.1.5 — 2026-04-06
 
 - **Fix Ingress (blank page):** use Dozzle's native `--base` flag with the full ingress token path instead of nginx `sub_filter`. Dozzle rewrites all asset and API URLs to include the token; nginx adds the prefix back (Supervisor strips it before forwarding). No HTML patching needed.

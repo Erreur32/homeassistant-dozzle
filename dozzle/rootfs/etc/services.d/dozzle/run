@@ -18,6 +18,7 @@ declare ENABLE_ACTIONS
 declare INGRESS_ENTRY
 declare REMOTE_AGENTS
 declare ENABLE_AGENT
+declare AGENT_HOSTNAME
 
 # --- Docker socket (docker_api: true in config.yaml) -------------------------
 if [ -S /var/run/docker.sock ]; then
@@ -46,6 +47,7 @@ FILTER="$(bashio::config 'filter' '')"
 NO_ANALYTICS="$(bashio::config 'no_analytics' 'true')"
 ENABLE_ACTIONS="$(bashio::config 'enable_actions' 'false')"
 ENABLE_AGENT="$(bashio::config 'enable_agent' 'false')"
+AGENT_HOSTNAME="$(bashio::config 'agent_hostname' '')"
 REMOTE_AGENTS="$(bashio::config 'remote_agents' '')"
 
 # --- Build Dozzle argument list ----------------------------------------------
@@ -88,7 +90,13 @@ fi
 # You do NOT need this to see HA containers in this add-on.
 if bashio::var.true "${ENABLE_AGENT}"; then
     bashio::log.info "Starting built-in agent on 0.0.0.0:7007 (map port 7007 in Network tab)"
-    /usr/local/bin/dozzle agent --addr "0.0.0.0:7007" --level "${LOG_LEVEL}" &
+    if bashio::var.has_value "${AGENT_HOSTNAME}"; then
+        bashio::log.info "Agent display name: ${AGENT_HOSTNAME}"
+        DOZZLE_HOSTNAME="${AGENT_HOSTNAME}" \
+            /usr/local/bin/dozzle agent --addr "0.0.0.0:7007" --level "${LOG_LEVEL}" &
+    else
+        /usr/local/bin/dozzle agent --addr "0.0.0.0:7007" --level "${LOG_LEVEL}" &
+    fi
     sleep 1
     bashio::log.info "Built-in agent ready on port 7007"
 fi
@@ -104,7 +112,7 @@ bashio::log.info "  Listen addr  : ${DOZZLE_ADDR} (nginx :8080 → here)"
 bashio::log.info "  Log level    : ${LOG_LEVEL}"
 bashio::log.info "  Filter       : ${FILTER:-none}"
 bashio::log.info "  Actions      : ${ENABLE_ACTIONS}"
-bashio::log.info "  Agent        : ${ENABLE_AGENT} (port 7007)"
+bashio::log.info "  Agent        : ${ENABLE_AGENT} (port 7007, name: ${AGENT_HOSTNAME:-default})"
 bashio::log.info "  Remote agents: ${REMOTE_AGENTS:-none}"
 bashio::log.info "================================================"
 

@@ -1,6 +1,3 @@
-release: v0.1.5
+release: v0.1.6
 
-- fix(ingress): use --base TOKEN_PATH + nginx rewrite instead of sub_filter
-- fix(nginx): wait loop — nginx starts only after Dozzle :8081 is ready
-- fix(agent): remove agent_port/agent_hostname options, hardcode 7007
-- docs(agent): clear descriptions — built-in agent vs remote agents
+- fix: restore agent_hostname option (removed by mistake in 0.1.5)
