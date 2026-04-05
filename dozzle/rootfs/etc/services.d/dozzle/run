@@ -34,9 +34,13 @@ else
 fi
 
 # --- Ingress (Supervisor proxy / panel frontend) ------------------------------
+# The Supervisor STRIPS the /api/hassio_ingress/TOKEN prefix before forwarding
+# to the container — the container always receives requests at "/" (ingress_entry: /).
+# Do NOT pass the full ingress token as --base; use "/" (Dozzle default).
 INGRESS_ENTRY="$(bashio::addon.ingress_entry)"
-DOZZLE_BASE_PATH="${INGRESS_ENTRY}"
-bashio::log.info "Ingress base path: ${DOZZLE_BASE_PATH}"
+DOZZLE_BASE_PATH="/"
+bashio::log.info "Ingress entry (external): ${INGRESS_ENTRY}"
+bashio::log.info "Dozzle base path (container): ${DOZZLE_BASE_PATH}"
 
 DOZZLE_ADDR=":8080"
 
