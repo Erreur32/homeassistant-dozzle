@@ -5,7 +5,7 @@
 
 <h2>Dozzle</h2>
 
-<p><strong>Real-time Docker logs in Home Assistant — full web UI, Ingress, optional agent.</strong></p>
+<p><strong>Real-time Docker logs in Home Assistant - full web UI, Ingress, optional agent.</strong></p>
 
 </div>
 
@@ -24,7 +24,7 @@ This repository ships the **Dozzle** **Home Assistant App** (formerly “add-on�
 
 | | |
 | --- | --- |
-| **Packaged app version** | `0.1.7` (see [`dozzle/config.yaml`](dozzle/config.yaml)) |
+| **Packaged app version** | `0.1.8` (see [`dozzle/config.yaml`](dozzle/config.yaml)) |
 | **Bundled Dozzle binary** | `v10.2.1` (see [`dozzle/Dockerfile`](dozzle/Dockerfile)) |
 | **Container image** | `ghcr.io/erreur32/homeassistant-dozzle` |
 
@@ -32,7 +32,7 @@ This repository ships the **Dozzle** **Home Assistant App** (formerly “add-on�
 
 > [!IMPORTANT]
 > **Not an official Dozzle project.** Packaging and integration are community-maintained.  
-> **This app includes the full Dozzle UI** — it is **not** the standalone “agent-only” add-on.  
+> **This app includes the full Dozzle UI** - it is **not** the standalone “agent-only” add-on.  
 > **Repository scope:** Home Assistant packaging for Dozzle only.
 
 ---
@@ -75,7 +75,7 @@ homeassistant-dozzle/
 | **Docker API** | List containers and tail logs (`docker_api: true`) |
 | **Embedded agent** | Optional `dozzle agent` on port **7007** (`enable_agent`) |
 | **Remote agents** | Comma-separated `host:port` in `remote_agents` |
-| **Image registry** | **GHCR** — see badge / releases |
+| **Image registry** | **GHCR** - see badge / releases |
 
 ---
 
@@ -94,7 +94,7 @@ Configurable in the Supervisor UI after install. Full reference: [`dozzle/DOCS.m
 | `agent_hostname` | Label for this agent in remote UIs |
 | `remote_agents` | Remote `host:port` list (comma-separated) |
 
-**Ports (optional):** **8080** — direct web access in addition to Ingress; **7007** — agent, only if the embedded agent is enabled and you map the port.
+**Ports (optional):** **8080** - direct web access in addition to Ingress; **7007** - agent, only if the embedded agent is enabled and you map the port.
 
 ---
 
@@ -148,8 +148,8 @@ Repository packaging: see [LICENSE][license] when present in the repo. Upstream 
 [license]: https://github.com/Erreur32/homeassistant-dozzle/blob/main/LICENSE
 [maintenance-shield]: https://img.shields.io/maintenance/yes/2026.svg
 [project-stage-shield]: https://img.shields.io/badge/project%20stage-stable-green.svg
-[release-shield]: https://img.shields.io/badge/version-v0.1.7-blue.svg
-[release]: https://github.com/Erreur32/homeassistant-dozzle/releases/tag/v0.1.7
+[release-shield]: https://img.shields.io/badge/version-v0.1.8-blue.svg
+[release]: https://github.com/Erreur32/homeassistant-dozzle/releases/tag/v0.1.8
 [license-shield]: https://img.shields.io/badge/license-MIT-blue.svg
 [issues-shield]: https://img.shields.io/github/issues/Erreur32/homeassistant-dozzle.svg
 [stars-shield]: https://img.shields.io/github/stars/Erreur32/homeassistant-dozzle.svg

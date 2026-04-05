@@ -1,4 +1,6 @@
+release: v0.1.8
+
 release: v0.1.7
 
-- fix(nginx): remove "user root;" — initgroups() blocked in HA sandbox
+- fix(nginx): remove "user root;" - initgroups() blocked in HA sandbox
 - fix(logs): rename DOZZLE_VERSION → HA_DOZZLE_BIN_VERSION (avoid Dozzle warning)

@@ -1,6 +1,6 @@
 #!/usr/bin/with-contenv bashio
 # ==============================================================================
-# nginx — reverse proxy in front of Dozzle
+# nginx - reverse proxy in front of Dozzle
 # Listens on :8080 (Ingress-facing), forwards to Dozzle on :8081.
 #
 # Key: Supervisor STRIPS /api/hassio_ingress/TOKEN before forwarding.
@@ -24,6 +24,6 @@ for i in $(seq 1 30); do
     curl -s --max-time 1 -o /dev/null http://127.0.0.1:8081/ 2>/dev/null && break || true
     sleep 1
 done
-bashio::log.info "nginx: Dozzle ready — starting proxy"
+bashio::log.info "nginx: Dozzle ready - starting proxy"
 
 exec nginx -g 'daemon off;' -e /dev/stderr

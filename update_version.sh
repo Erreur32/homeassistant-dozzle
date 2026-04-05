@@ -5,17 +5,17 @@
 #          ./update_version.sh <new_version> --tag-push
 #
 # Updated files:
-#   1. dozzle/config.yaml     — version (manifest Supervisor / store)
-#   2. dozzle/Dockerfile      — ARG BUILD_VERSION (default image label / local builds)
-#   3. README.md (root)       — always, if present:
+#   1. dozzle/config.yaml     - version (manifest Supervisor / store)
+#   2. dozzle/Dockerfile      - ARG BUILD_VERSION (default image label / local builds)
+#   3. README.md (root)       - always, if present:
 #        • [release-shield] / version-vCURRENT-blue → NEW (reference links at file bottom)
 #        • releases/tag/vCURRENT → vNEW
 #        • `CURRENT` → `NEW` in backticks (About table: packaged app version)
 #        • line "Bundled Dozzle binary" → backticks set from ARG DOZZLE_VERSION in Dockerfile
-#   4. dozzle/README.md       — same badge/link patterns as (3), if those lines exist
+#   4. dozzle/README.md       - same badge/link patterns as (3), if those lines exist
 #
 # Commit message file (edit before committing):
-#   5. commit-message.txt     — git commit -F commit-message.txt
+#   5. commit-message.txt     - git commit -F commit-message.txt
 #
 # Options:
 #   --tag-push   Après bump : commit (si fichiers modifiés), tag v<NEW>, puis
@@ -100,7 +100,7 @@ if [ -z "$NEW" ]; then
   SUGGESTED=$(echo "$CURRENT" | awk -F. '{$NF=$NF+1; print $0}' OFS=.)
   echo ""
   echo -e "${M}${B}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${R}"
-  echo -e "${M}${B}  HA Dozzle — current state${R}"
+  echo -e "${M}${B}  HA Dozzle - current state${R}"
   echo -e "${M}${B}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${R}"
   echo ""
   echo -e "  ${B}App version  (config.yaml):${R}  ${C}${CURRENT}${R}  →  suggested next: ${C}${SUGGESTED}${R}"
@@ -111,7 +111,7 @@ if [ -z "$NEW" ]; then
     elif [ -n "$DOZZLE_LATEST" ]; then
       echo -e "  ${B}Dozzle binary (Dockerfile):${R}  ${G}${DOZZLE_CURRENT}${R}  ${G}✓ up to date${R} (latest: ${DOZZLE_LATEST})"
     else
-      echo -e "  ${B}Dozzle binary (Dockerfile):${R}  ${C}${DOZZLE_CURRENT}${R}  ${Y}(could not fetch latest — no network?)${R}"
+      echo -e "  ${B}Dozzle binary (Dockerfile):${R}  ${C}${DOZZLE_CURRENT}${R}  ${Y}(could not fetch latest - no network?)${R}"
     fi
   fi
   echo ""
@@ -158,7 +158,7 @@ if [ "$NEW" != "$CURRENT" ]; then
     echo -e "  ${RED}✗${R} dozzle/config.yaml        ${RED}(missing)${R}"
   fi
 
-  # 2. dozzle/Dockerfile — ARG BUILD_VERSION + ARG DOZZLE_VERSION if newer available
+  # 2. dozzle/Dockerfile - ARG BUILD_VERSION + ARG DOZZLE_VERSION if newer available
   if [ -f "$DOCKERFILE" ]; then
     sedi "$DOCKERFILE" "s/^ARG BUILD_VERSION=.*/ARG BUILD_VERSION=${NEW}/"
     echo -e "  ${G}✓${R} dozzle/Dockerfile         ${C}ARG BUILD_VERSION=${NEW}${R}"
@@ -174,8 +174,8 @@ if [ "$NEW" != "$CURRENT" ]; then
     echo -e "  ${RED}✗${R} dozzle/Dockerfile         ${RED}(missing)${R}"
   fi
 
-  # 3. README.md (root) — release badge / tag URL / About table (exact CURRENT → NEW)
-  #     Reference-style shields: [release-shield]: .../version-v0.0.1-blue.svg — no grep gate
+  # 3. README.md (root) - release badge / tag URL / About table (exact CURRENT → NEW)
+  #     Reference-style shields: [release-shield]: .../version-v0.0.1-blue.svg - no grep gate
   if [ -f "$ROOT_README" ]; then
     if grep -q "version-v${CURRENT_ESC}-blue" "$ROOT_README" 2>/dev/null; then
       sedi "$ROOT_README" "s/version-v${CURRENT_ESC}-blue/version-v${NEW}-blue/g"
@@ -185,7 +185,7 @@ if [ "$NEW" != "$CURRENT" ]; then
     fi
     # Packaged app version (About table): `CURRENT` → `NEW` wherever that exact semver appears in backticks
     sedi "$ROOT_README" "s/\`${CURRENT_ESC}\`/\`${NEW}\`/g"
-    # Bundled Dozzle binary — mirror ARG DOZZLE_VERSION from Dockerfile (first `...` on that line)
+    # Bundled Dozzle binary - mirror ARG DOZZLE_VERSION from Dockerfile (first `...` on that line)
     if [ -f "$DOCKERFILE" ]; then
       DOZZLE_VER=$(grep -E '^ARG DOZZLE_VERSION=' "$DOCKERFILE" | head -1 | sed 's/^ARG DOZZLE_VERSION=//')
       if [ -n "$DOZZLE_VER" ] && grep -q 'Bundled Dozzle binary' "$ROOT_README" 2>/dev/null; then
@@ -197,7 +197,7 @@ if [ "$NEW" != "$CURRENT" ]; then
     echo -e "  ${Y}○${R} README.md                 ${Y}(not found)${R}"
   fi
 
-  # 4. dozzle/README.md — same semver replacements if those strings exist
+  # 4. dozzle/README.md - same semver replacements if those strings exist
   if [ -f "$DOZZLE_README" ]; then
     if grep -q "version-v${CURRENT_ESC}-blue" "$DOZZLE_README" 2>/dev/null; then
       sedi "$DOZZLE_README" "s/version-v${CURRENT_ESC}-blue/version-v${NEW}-blue/g"
@@ -231,7 +231,7 @@ release: v${NEW}
 - Version ${NEW}
 CMEOF
     fi
-    echo -e "  ${G}✓${R} commit-message.txt        ${C}(created — release: v${NEW})${R}"
+    echo -e "  ${G}✓${R} commit-message.txt        ${C}(created - release: v${NEW})${R}"
   elif ! grep -qE "v${NEW}|release:.*${NEW}" "$COMMIT_MSG_FILE" 2>/dev/null; then
     {
       echo "release: v${NEW}"
@@ -276,7 +276,7 @@ do_commit_tag_push() {
 
   branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || true)
   if [ "$branch" = "HEAD" ]; then
-    echo -e "${RED}Error:${R} detached HEAD — switch to a branch before pushing."
+    echo -e "${RED}Error:${R} detached HEAD - switch to a branch before pushing."
     echo -e "  Example: ${C}git checkout main${R} or ${C}git switch main${R}"
     return 1
   fi
@@ -298,7 +298,7 @@ do_commit_tag_push() {
   fi
 
   if [ -n "$(git status --porcelain 2>/dev/null)" ]; then
-    echo -e "  ${B}Uncommitted changes — git add / commit...${R}"
+    echo -e "  ${B}Uncommitted changes - git add / commit...${R}"
     git add -A
     if [ -f "$COMMIT_MSG_FILE" ] && grep -qE "v${NEW}|release:.*${NEW}" "$COMMIT_MSG_FILE" 2>/dev/null; then
       git commit -F "$COMMIT_MSG_FILE" || { echo -e "${RED}Commit failed.${R}"; return 1; }
@@ -309,7 +309,7 @@ do_commit_tag_push() {
     fi
     echo ""
   else
-    echo -e "  ${G}✓${R} Working tree clean — no new commit."
+    echo -e "  ${G}✓${R} Working tree clean - no new commit."
     echo ""
   fi
 
@@ -326,7 +326,7 @@ do_commit_tag_push() {
     git fetch origin || true
     if git show-ref --verify --quiet "refs/remotes/origin/${branch}" 2>/dev/null; then
       if ! git merge-base --is-ancestor "origin/${branch}" HEAD 2>/dev/null; then
-        echo -e "  ${Y}→${R} Remote branch has new commits — ${C}git pull --rebase origin ${branch}${R}"
+        echo -e "  ${Y}→${R} Remote branch has new commits - ${C}git pull --rebase origin ${branch}${R}"
         git pull --rebase origin "$branch" || {
           echo -e "${RED}Rebase interrupted (conflicts?).${R} Resolve then: ${C}git rebase --continue${R}"
           return 1
@@ -337,7 +337,7 @@ do_commit_tag_push() {
 
   echo -e "  ${B}Pushing branch ${C}${branch}${R} + tag ${C}${tag_name}${R}...${R}"
   if ! git push origin "$branch" "$tag_name"; then
-    echo -e "  ${Y}→${R} Push rejected — retrying after rebase..."
+    echo -e "  ${Y}→${R} Push rejected - retrying after rebase..."
     git fetch origin
     if git show-ref --verify --quiet "refs/remotes/origin/${branch}" 2>/dev/null; then
       git pull --rebase origin "$branch" || {

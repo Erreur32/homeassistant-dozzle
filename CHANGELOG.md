@@ -4,76 +4,84 @@ All notable changes to this repository ([homeassistant-dozzle](https://github.co
 
 ---
 
-## 0.1.1 — 2026-04-05
+## 0.1.8 - 2026-04-05
 
-- **Security:** enable AppArmor profile (`dozzle/apparmor.txt`) — was `false`, now restricts filesystem, capabilities and network access; improves HA security badge score.
-- **Fix ingress:** set `--base /` (Supervisor strips ingress prefix before forwarding to container — passing the full token path caused 404).
+- **Fix nginx:** `master_process off` - single-process mode avoids all `chown()`/`setgid()` calls blocked by the HA sandbox; fixes `chown("/tmp/nginx_client", 100) failed` error introduced in 0.1.7.
+- **Docs:** badges (stars, issues) added to the add-on info page (`dozzle/README.md`).
+- **Cleanup:** replace all em dashes in all project files and scripts.
 
 ---
 
-## 0.1.0 — 2026-04-05
+## 0.1.1 - 2026-04-05
+
+- **Security:** enable AppArmor profile (`dozzle/apparmor.txt`) - was `false`, now restricts filesystem, capabilities and network access; improves HA security badge score.
+- **Fix ingress:** set `--base /` (Supervisor strips ingress prefix before forwarding to container - passing the full token path caused 404).
+
+---
+
+## 0.1.0 - 2026-04-05
 
 - **Fix build:** Dozzle upstream image tag corrected to `v10.2.1` (tags use `v` prefix; `10.0.6` did not exist on Docker Hub).
 - **Bundled Dozzle:** upgraded from `10.0.6` → `v10.2.1`.
 
 ---
 
-## 0.0.9 — 2026-04-05
+## 0.0.9 - 2026-04-05
 
-- **Fix CI:** replace `actions/checkout@v6.0.2` (non-existent) with `actions/checkout@v4` — init job was silently failing, build/push jobs were never executed.
+- **Fix CI:** replace `actions/checkout@v6.0.2` (non-existent) with `actions/checkout@v4` - init job was silently failing, build/push jobs were never executed.
 - **CI:** builder now triggers on `v*` tags in addition to pushes to `main`.
 
 ---
 
-## 0.0.8 — 2026-04-05
+## 0.0.8 - 2026-04-05
 
-- **Fix build:** move `ARG BUILD_FROM` before the first `FROM` (global Docker scope) — fixes `base name should not be blank` CI build error.
-
----
-
-## 0.0.7 — 2026-04-05
-
-- **Fix:** add `dozzle/icon.png` (128×128) and `dozzle/logo.png` (250×100) — icon now visible in the HA add-on store.
-- **Docs:** `DOCS.md` rewritten — logo at top, cleaner option/port tables, 403 GHCR troubleshooting entry.
+- **Fix build:** move `ARG BUILD_FROM` before the first `FROM` (global Docker scope) - fixes `base name should not be blank` CI build error.
 
 ---
 
-## 0.0.6 — 2026-04-05
+## 0.0.7 - 2026-04-05
 
-- **HA 2026.4 compliance:** `arch` limited to `amd64` and `aarch64` (only architectures built by CI — armv7/i386 removed to prevent broken installs).
+- **Fix:** add `dozzle/icon.png` (128×128) and `dozzle/logo.png` (250×100) - icon now visible in the HA add-on store.
+- **Docs:** `DOCS.md` rewritten - logo at top, cleaner option/port tables, 403 GHCR troubleshooting entry.
+
+---
+
+## 0.0.6 - 2026-04-05
+
+- **HA 2026.4 compliance:** `arch` limited to `amd64` and `aarch64` (only architectures built by CI - armv7/i386 removed to prevent broken installs).
 - **HA 2026.4 compliance:** remove `panel_admin` from `config.yaml` (undocumented key in the 2026 spec, ignored/dropped by the Supervisor).
 
 ---
 
-## 0.0.5 — 2026-04-05
+## 0.0.5 - 2026-04-05
 
 - **CI fix:** remove unused `.github/workflows/docker-image.yml` that referenced a non-existent `Dockerfile` at the repo root and caused build errors on every push. `builder.yaml` is the only workflow needed.
 
 ---
 
-## 0.0.4 — 2026-04-05
+## 0.0.4 - 2026-04-05
 
-- **Documentation (English):** root [`README.md`](README.md), [`dozzle/README.md`](dozzle/README.md), [`dozzle/DOCS.md`](dozzle/DOCS.md) — clearer structure (tables, sections), shield badges and My Home Assistant add-repo flow; IMPORTANT block corrected (full Dozzle web UI + Ingress, not the agent-only add-on).
+- **Documentation (English):** root [`README.md`](README.md), [`dozzle/README.md`](dozzle/README.md), [`dozzle/DOCS.md`](dozzle/DOCS.md) - clearer structure (tables, sections), shield badges and My Home Assistant add-repo flow; IMPORTANT block corrected (full Dozzle web UI + Ingress, not the agent-only add-on).
 - **Tooling:** [`update_version.sh`](update_version.sh) updates root `README.md` on each bump: `[release-shield]` / `version-vX.Y.Z-blue`, GitHub `releases/tag/vX.Y.Z` URL, and `` `semver` `` for the packaged app version from `dozzle/config.yaml`; the **Bundled Dozzle binary** table row is synced from `ARG DOZZLE_VERSION` in `dozzle/Dockerfile`.
 - **Project:** this file at the repository root; [`dozzle/CHANGELOG.md`](dozzle/CHANGELOG.md) kept in sync for the app folder and existing doc links.
 
 ---
 
-## 0.0.3 — 2026-04-05
+## 0.0.3 - 2026-04-05
 
 - Root **README** refresh: centered logo, shield-style badges, [My Home Assistant](https://my.home-assistant.io/redirect/supervisor_add_addon_repository/) add-repository button, repository tree, configuration summary.
 - Changelog and commit message prepared for release **v0.0.3** (workflow with `update_version.sh` / `commit-message.txt`).
 
 ---
 
-## 0.0.2 — 2026-04-05
+## 0.0.2 - 2026-04-05
 
 - **Root README:** repository-style layout (centered logo, shield badges, My Home Assistant add-repo button, tree, config excerpts).
 - Commit message and changelog prepared for **v0.0.2** (push via `update_version.sh`).
 
 ---
 
-## 0.0.1 — 2026-04-05
+## 0.0.1 - 2026-04-05
 
 - **Dozzle** Home Assistant App: Ingress, `ingress_stream`, optional agent, **GHCR** image `ghcr.io/erreur32/homeassistant-dozzle`, **`builder.yaml`** workflow (BuildKit).
 - Manifest **`arch`**: **amd64** and **aarch64** only for CI (required by Home Assistant 2026 `prepare-multi-arch-matrix`; **armv7** / **i386** excluded from CI builds).

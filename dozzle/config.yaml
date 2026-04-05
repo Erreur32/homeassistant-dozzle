@@ -1,8 +1,8 @@
-# Home Assistant App manifest — official docs April 2026:
+# Home Assistant App manifest - official docs April 2026:
 # https://developers.home-assistant.io/docs/apps/configuration
 # Do not use the `advanced` key (deprecated since Supervisor 2026.03.0).
 name: "Dozzle"
-version: "0.1.7"
+version: "0.1.8"
 slug: "dozzle"
 description: "Real-time Docker log viewer (Ingress, optional agent)"
 # Project page (support / source of the packaged app for HA)
@@ -20,7 +20,7 @@ startup: services
 init: false
 boot: auto
 
-# AppArmor profile (dozzle/apparmor.txt) — restricts filesystem and network access
+# AppArmor profile (dozzle/apparmor.txt) - restricts filesystem and network access
 apparmor: true
 
 ingress: true
@@ -38,7 +38,7 @@ ports:
   7007/tcp: null
 ports_description:
   8080/tcp: "Web UI (optional direct access)"
-  7007/tcp: "Dozzle agent — map only if the built-in agent is enabled"
+  7007/tcp: "Dozzle agent - map only if the built-in agent is enabled"
 
 docker_api: true
 hassio_api: true

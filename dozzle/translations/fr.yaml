@@ -1,6 +1,6 @@
 network:
   8080/tcp: "Accès direct optionnel à l’interface web (Ingress par défaut)."
-  7007/tcp: "Agent Dozzle — à mapper uniquement si « Agent intégré » est activé."
+  7007/tcp: "Agent Dozzle - à mapper uniquement si « Agent intégré » est activé."
 
 configuration:
   log_level:

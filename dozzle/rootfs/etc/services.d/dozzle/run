@@ -1,6 +1,6 @@
 #!/usr/bin/with-contenv bashio
 # ==============================================================================
-# Home Assistant App — Dozzle
+# Home Assistant App - Dozzle
 # Ingress: nginx on :8080 adds back /api/hassio_ingress/TOKEN prefix,
 #          Dozzle on :8081 runs with --base TOKEN_PATH so all asset/API
 #          URLs are correctly scoped to the Ingress URL.
@@ -24,12 +24,12 @@ declare AGENT_HOSTNAME
 if [ -S /var/run/docker.sock ]; then
     if curl -s --unix-socket /var/run/docker.sock http://localhost/version >/dev/null 2>&1; then
         DOCKER_VERSION="$(curl -s --unix-socket /var/run/docker.sock http://localhost/version | jq -r '.Version')"
-        bashio::log.info "Docker API OK — engine ${DOCKER_VERSION}"
+        bashio::log.info "Docker API OK - engine ${DOCKER_VERSION}"
     else
         bashio::log.warning "Docker socket found but API is not responding"
     fi
 else
-    bashio::log.error "No socket at /var/run/docker.sock — enable docker_api in the manifest"
+    bashio::log.error "No socket at /var/run/docker.sock - enable docker_api in the manifest"
 fi
 
 # --- Ingress base path -------------------------------------------------------

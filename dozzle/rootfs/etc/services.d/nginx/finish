@@ -1,6 +1,6 @@
 #!/usr/bin/env bashio
 # ==============================================================================
-# nginx finish — called when nginx exits
+# nginx finish - called when nginx exits
 # ==============================================================================
 
 declare APP_EXIT_CODE=${1}
