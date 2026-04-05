@@ -24,7 +24,7 @@ This repository ships the **Dozzle** **Home Assistant App** (formerly â€œadd-onâ
 
 | | |
 | --- | --- |
-| **Packaged app version** | `0.1.0` (see [`dozzle/config.yaml`](dozzle/config.yaml)) |
+| **Packaged app version** | `0.1.1` (see [`dozzle/config.yaml`](dozzle/config.yaml)) |
 | **Bundled Dozzle binary** | `v10.2.1` (see [`dozzle/Dockerfile`](dozzle/Dockerfile)) |
 | **Container image** | `ghcr.io/erreur32/homeassistant-dozzle` |
 
@@ -148,8 +148,8 @@ Repository packaging: see [LICENSE][license] when present in the repo. Upstream 
 [license]: https://github.com/Erreur32/homeassistant-dozzle/blob/main/LICENSE
 [maintenance-shield]: https://img.shields.io/maintenance/yes/2026.svg
 [project-stage-shield]: https://img.shields.io/badge/project%20stage-stable-green.svg
-[release-shield]: https://img.shields.io/badge/version-v0.1.0-blue.svg
-[release]: https://github.com/Erreur32/homeassistant-dozzle/releases/tag/v0.1.0
+[release-shield]: https://img.shields.io/badge/version-v0.1.1-blue.svg
+[release]: https://github.com/Erreur32/homeassistant-dozzle/releases/tag/v0.1.1
 [license-shield]: https://img.shields.io/badge/license-MIT-blue.svg
 [issues-shield]: https://img.shields.io/github/issues/Erreur32/homeassistant-dozzle.svg
 [stars-shield]: https://img.shields.io/github/stars/Erreur32/homeassistant-dozzle.svg

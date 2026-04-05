@@ -1,0 +1,44 @@
+#include <tunables/global>
+
+profile dozzle flags=(attach_disconnected,mediate_deleted) {
+  #include <abstractions/base>
+
+  # Allow all file operations (required for s6-overlay init system)
+  file,
+
+  # Signal handling (s6 process supervision)
+  signal (send) set=(kill,term,int,hup,cont),
+
+  # s6-overlay: init, supervision tree, oneshot runners
+  /run/s6/** rwix,
+  /run/s6-rc/** rwix,
+  /package/** rix,
+  /command/** rix,
+
+  # Bashio (HA add-on helper library)
+  /usr/lib/bashio/** rix,
+  /usr/bin/bashio rix,
+
+  # System binaries used by run/finish scripts
+  /bin/** rix,
+  /usr/bin/** rix,
+  /sbin/** rix,
+  /usr/sbin/** rix,
+
+  # Dozzle binary
+  /usr/local/bin/dozzle ix,
+
+  # Docker socket (required: docker_api: true)
+  /var/run/docker.sock rw,
+
+  # Runtime and temp
+  /tmp/** rwk,
+  /dev/tty rw,
+  /dev/null rw,
+  /dev/zero r,
+
+  # Network (web UI + agent + Docker API)
+  network inet stream,
+  network inet6 stream,
+  network unix stream,
+}

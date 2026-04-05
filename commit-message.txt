@@ -1,3 +1,4 @@
-release: v0.1.0
+release: v0.1.1
 
-- fix: Dozzle upstream tag v10.2.1 (was 10.0.6 without v prefix — image not found on Docker Hub)
+- security: enable AppArmor profile (apparmor.txt) — was false, improves HA security score
+- fix: set --base / for Dozzle ingress (Supervisor strips token prefix before forwarding)

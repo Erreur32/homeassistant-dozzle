@@ -2,7 +2,7 @@
 # https://developers.home-assistant.io/docs/apps/configuration
 # Do not use the `advanced` key (deprecated since Supervisor 2026.03.0).
 name: "Dozzle"
-version: "0.1.0"
+version: "0.1.1"
 slug: "dozzle"
 description: "Real-time Docker log viewer (Ingress, optional agent)"
 # Project page (support / source of the packaged app for HA)
@@ -20,8 +20,8 @@ startup: services
 init: false
 boot: auto
 
-# AppArmor: disabled — Docker API / socket access; a custom profile would be required otherwise
-apparmor: false
+# AppArmor profile (dozzle/apparmor.txt) — restricts filesystem and network access
+apparmor: true
 
 ingress: true
 ingress_port: 8080

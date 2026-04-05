@@ -4,6 +4,13 @@ All notable changes to this repository ([homeassistant-dozzle](https://github.co
 
 ---
 
+## 0.1.1 — 2026-04-05
+
+- **Security:** enable AppArmor profile (`dozzle/apparmor.txt`) — was `false`, now restricts filesystem, capabilities and network access; improves HA security badge score.
+- **Fix ingress:** set `--base /` (Supervisor strips ingress prefix before forwarding to container — passing the full token path caused 404).
+
+---
+
 ## 0.1.0 — 2026-04-05
 
 - **Fix build:** Dozzle upstream image tag corrected to `v10.2.1` (tags use `v` prefix; `10.0.6` did not exist on Docker Hub).
