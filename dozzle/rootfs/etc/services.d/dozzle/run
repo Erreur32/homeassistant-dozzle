@@ -105,7 +105,7 @@ fi
 bashio::log.info "================================================"
 bashio::log.info "  Dozzle for Home Assistant"
 bashio::log.info "  App version  : ${BUILD_VERSION:-unknown}"
-bashio::log.info "  Dozzle binary: ${DOZZLE_VERSION:-unknown}"
+bashio::log.info "  Dozzle binary: ${HA_DOZZLE_BIN_VERSION:-unknown}"
 bashio::log.info "------------------------------------------------"
 bashio::log.info "  Ingress base : ${INGRESS_ENTRY}"
 bashio::log.info "  Listen addr  : ${DOZZLE_ADDR} (nginx :8080 → here)"

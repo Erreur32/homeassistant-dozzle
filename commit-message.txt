@@ -1,3 +1,4 @@
-release: v0.1.6
+release: v0.1.7
 
-- fix: restore agent_hostname option (removed by mistake in 0.1.5)
+- fix(nginx): remove "user root;" — initgroups() blocked in HA sandbox
+- fix(logs): rename DOZZLE_VERSION → HA_DOZZLE_BIN_VERSION (avoid Dozzle warning)

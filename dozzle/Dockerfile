@@ -10,12 +10,13 @@ FROM amir20/dozzle:${DOZZLE_VERSION} AS dozzle_upstream
 
 FROM ${BUILD_FROM}
 
-ARG BUILD_VERSION=0.1.6
+ARG BUILD_VERSION=0.1.7
 ARG BUILD_ARCH=amd64
 
 # Expose build versions as runtime env vars (readable in run scripts / logs)
+# Note: DOZZLE_* prefix is reserved by Dozzle itself — use HA_DOZZLE_BIN_VERSION instead
 ENV BUILD_VERSION=${BUILD_VERSION}
-ENV DOZZLE_VERSION=${DOZZLE_VERSION}
+ENV HA_DOZZLE_BIN_VERSION=${DOZZLE_VERSION}
 
 RUN apk add --no-cache jq curl nginx \
     && rm -f /etc/nginx/http.d/default.conf

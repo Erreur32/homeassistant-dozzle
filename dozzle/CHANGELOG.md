@@ -6,6 +6,13 @@ A copy also lives at the repository root: [`CHANGELOG.md`](../CHANGELOG.md).
 
 ---
 
+## 0.1.7 — 2026-04-06
+
+- **Fix nginx:** remove `user root;` directive — `initgroups()` is blocked in the HA sandbox; the container already runs as root so the directive is unnecessary.
+- **Fix log warning:** rename `DOZZLE_VERSION` env var to `HA_DOZZLE_BIN_VERSION` — Dozzle treats any `DOZZLE_*` env var as its own config and logged a warning.
+
+---
+
 ## 0.1.6 — 2026-04-06
 
 - **Restore `agent_hostname`** option (removed by mistake in 0.1.5) — sets the display name for the built-in agent as seen by remote Dozzle UIs.
