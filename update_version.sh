@@ -70,6 +70,21 @@ if [ -z "$CURRENT" ]; then
   exit 1
 fi
 
+# ── Current Dozzle upstream version (from Dockerfile) ────────────────────────
+DOZZLE_CURRENT=""
+if [ -f "$DOCKERFILE" ]; then
+  DOZZLE_CURRENT=$(grep -E '^ARG DOZZLE_VERSION=' "$DOCKERFILE" | head -1 | sed 's/^ARG DOZZLE_VERSION=//')
+fi
+
+# ── Latest Dozzle version from GitHub API ────────────────────────────────────
+DOZZLE_LATEST=""
+if command -v curl >/dev/null 2>&1; then
+  DOZZLE_LATEST=$(curl -sf --max-time 5 \
+    "https://api.github.com/repos/amir20/dozzle/releases/latest" \
+    | grep '"tag_name"' | head -1 \
+    | sed 's/.*"tag_name":[[:space:]]*"\([^"]*\)".*/\1/' 2>/dev/null || true)
+fi
+
 # ── Args: new version + optional --tag-push ─────────────────────────────────
 NEW=""
 TAG_PUSH=""
@@ -84,7 +99,21 @@ done
 if [ -z "$NEW" ]; then
   SUGGESTED=$(echo "$CURRENT" | awk -F. '{$NF=$NF+1; print $0}' OFS=.)
   echo ""
-  echo -e "  ${B}Current version:${R} ${C}${CURRENT}${R}"
+  echo -e "${M}${B}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${R}"
+  echo -e "${M}${B}  HA Dozzle — current state${R}"
+  echo -e "${M}${B}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${R}"
+  echo ""
+  echo -e "  ${B}App version  (config.yaml):${R}  ${C}${CURRENT}${R}  →  suggested next: ${C}${SUGGESTED}${R}"
+  echo ""
+  if [ -n "$DOZZLE_CURRENT" ]; then
+    if [ -n "$DOZZLE_LATEST" ] && [ "$DOZZLE_LATEST" != "$DOZZLE_CURRENT" ]; then
+      echo -e "  ${B}Dozzle binary (Dockerfile):${R}  ${Y}${DOZZLE_CURRENT}${R}  →  latest: ${G}${DOZZLE_LATEST}${R}  ${Y}⬆ update available${R}"
+    elif [ -n "$DOZZLE_LATEST" ]; then
+      echo -e "  ${B}Dozzle binary (Dockerfile):${R}  ${G}${DOZZLE_CURRENT}${R}  ${G}✓ up to date${R} (latest: ${DOZZLE_LATEST})"
+    else
+      echo -e "  ${B}Dozzle binary (Dockerfile):${R}  ${C}${DOZZLE_CURRENT}${R}  ${Y}(could not fetch latest — no network?)${R}"
+    fi
+  fi
   echo ""
   echo "  Usage: $0 <new_version> [--tag-push]"
   echo ""
@@ -129,10 +158,18 @@ if [ "$NEW" != "$CURRENT" ]; then
     echo -e "  ${RED}✗${R} dozzle/config.yaml        ${RED}(missing)${R}"
   fi
 
-  # 2. dozzle/Dockerfile — ARG BUILD_VERSION only (not DOZZLE_VERSION upstream)
+  # 2. dozzle/Dockerfile — ARG BUILD_VERSION + ARG DOZZLE_VERSION if newer available
   if [ -f "$DOCKERFILE" ]; then
     sedi "$DOCKERFILE" "s/^ARG BUILD_VERSION=.*/ARG BUILD_VERSION=${NEW}/"
     echo -e "  ${G}✓${R} dozzle/Dockerfile         ${C}ARG BUILD_VERSION=${NEW}${R}"
+    # Auto-update upstream Dozzle version if newer is available
+    if [ -n "$DOZZLE_LATEST" ] && [ -n "$DOZZLE_CURRENT" ] && [ "$DOZZLE_LATEST" != "$DOZZLE_CURRENT" ]; then
+      sedi "$DOCKERFILE" "s/^ARG DOZZLE_VERSION=.*/ARG DOZZLE_VERSION=${DOZZLE_LATEST}/"
+      echo -e "  ${G}✓${R} dozzle/Dockerfile         ${C}ARG DOZZLE_VERSION: ${DOZZLE_CURRENT} → ${DOZZLE_LATEST}${R}  ${G}⬆ updated${R}"
+      DOZZLE_BUMPED="1"
+    elif [ -n "$DOZZLE_CURRENT" ]; then
+      echo -e "  ${G}✓${R} dozzle/Dockerfile         ${C}ARG DOZZLE_VERSION=${DOZZLE_CURRENT}${R}  ${G}(up to date)${R}"
+    fi
   else
     echo -e "  ${RED}✗${R} dozzle/Dockerfile         ${RED}(missing)${R}"
   fi
@@ -180,11 +217,20 @@ if [ "$NEW" != "$CURRENT" ]; then
   echo -e "  ${B}── commit-message.txt ──${R}"
   # Always ensure a usable commit message for -F (avoids the generic fallback)
   if [ ! -f "$COMMIT_MSG_FILE" ]; then
-    cat > "$COMMIT_MSG_FILE" << CMEOF
+    if [ -n "$DOZZLE_BUMPED" ]; then
+      cat > "$COMMIT_MSG_FILE" << CMEOF
+release: v${NEW}
+
+- App version ${NEW}
+- Dozzle binary: ${DOZZLE_CURRENT} → ${DOZZLE_LATEST}
+CMEOF
+    else
+      cat > "$COMMIT_MSG_FILE" << CMEOF
 release: v${NEW}
 
 - Version ${NEW}
 CMEOF
+    fi
     echo -e "  ${G}✓${R} commit-message.txt        ${C}(created — release: v${NEW})${R}"
   elif ! grep -qE "v${NEW}|release:.*${NEW}" "$COMMIT_MSG_FILE" 2>/dev/null; then
     {
