@@ -4,9 +4,14 @@ All notable changes to this repository ([homeassistant-dozzle](https://github.co
 
 ---
 
+## 0.1.9 - 2026-04-06
+
+- **Fix nginx:** restore `user root;` - reverts 0.1.7/0.1.8 attempts; `initgroups(root, 0) failed` is a harmless cosmetic log line (nginx is already root, no privilege drop occurs); the `chown()` fatal error only happens without `user root;`.
+
+---
+
 ## 0.1.8 - 2026-04-05
 
-- **Fix nginx:** `master_process off` - single-process mode avoids all `chown()`/`setgid()` calls blocked by the HA sandbox; fixes `chown("/tmp/nginx_client", 100) failed` error introduced in 0.1.7.
 - **Docs:** badges (stars, issues) added to the add-on info page (`dozzle/README.md`).
 - **Cleanup:** replace all em dashes in all project files and scripts.
 
