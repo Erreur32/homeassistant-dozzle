@@ -289,8 +289,8 @@ do_commit_tag_push() {
     fi
   fi
 
-  echo -e "  ${B}Push de la branche ${C}${branch}${R}...${R}"
-  if ! git push origin "$branch"; then
+  echo -e "  ${B}Push branche ${C}${branch}${R} + tag ${C}${tag_name}${R}...${R}"
+  if ! git push origin "$branch" "$tag_name"; then
     echo -e "  ${Y}→${R} Push refusé — nouvelle tentative après rebase..."
     git fetch origin
     if git show-ref --verify --quiet "refs/remotes/origin/${branch}" 2>/dev/null; then
@@ -299,16 +299,9 @@ do_commit_tag_push() {
         return 1
       }
     fi
-    git push origin "$branch" || { echo -e "${RED}Push de la branche échoué.${R}"; return 1; }
+    git push origin "$branch" "$tag_name" || { echo -e "${RED}Push échoué.${R}"; return 1; }
   fi
-  echo -e "  ${G}✓${R} Branche poussée."
-
-  if git ls-remote origin "refs/tags/${tag_name}" 2>/dev/null | grep -q .; then
-    echo -e "  ${Y}○${R} Tag ${C}${tag_name}${R} déjà sur le remote — ignoré."
-  else
-    git push origin "$tag_name" || { echo -e "${RED}Push du tag échoué.${R}"; return 1; }
-    echo -e "  ${G}✓${R} Tag ${C}${tag_name}${R} poussé."
-  fi
+  echo -e "  ${G}✓${R} Branche + tag poussés."
   echo ""
   echo -e "  ${G}✓${R} Done."
   return 0
@@ -336,9 +329,9 @@ if [ "$NEW" != "$CURRENT" ]; then
   echo -e "${C}${B}  Commands (copy / paste)${R}"
   echo -e "${C}${B}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${R}"
   echo ""
-  echo -e "  ${G}git add -A && git commit -F commit-message.txt && git push${R}"
+  echo -e "  ${G}git add -A && git commit -F commit-message.txt${R}"
   echo ""
-  echo -e "  ${G}git tag -a v${NEW} -m \"Release v${NEW}\" && git push origin v${NEW}${R}"
+  echo -e "  ${G}git tag -a v${NEW} -m \"Release v${NEW}\" && git push origin main v${NEW}${R}"
   echo ""
   echo -e "  ${B}Or:${R} ${C}$0 ${NEW} --tag-push${R}"
   echo ""
