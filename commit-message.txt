@@ -1,4 +1,5 @@
-release: v0.2.2
+release: v0.2.3
 
-- New polygonal Dozzle icon/logo
-- Docs: use project SVG logo instead of upstream
+- fix(direct-access): override DOZZLE_BASE="/" for direct-access instance
+  Global export DOZZLE_BASE (ingress token) was overriding --base / CLI flag,
+  causing 404 on all assets via port 8088.

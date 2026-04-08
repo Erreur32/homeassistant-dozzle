@@ -4,6 +4,12 @@ All notable changes to this repository ([homeassistant-dozzle](https://github.co
 
 ---
 
+## 0.2.3 - 2026-04-08
+
+- **Fix direct access (blank page):** override `DOZZLE_BASE="/"` for the direct-access instance - the global `export DOZZLE_BASE` (ingress token path) was taking priority over the `--base /` CLI flag.
+
+---
+
 ## 0.2.2 - 2026-04-08
 
 - **Icons:** new polygonal Dozzle mascot for `icon.png`, `logo.png` and SVG logo.

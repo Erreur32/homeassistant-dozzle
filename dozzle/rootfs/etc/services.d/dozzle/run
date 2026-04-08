@@ -108,10 +108,10 @@ if bashio::var.true "${ENABLE_DIRECT_ACCESS}"; then
         DIRECT_ARGS+=("--enable-actions")
     fi
     if bashio::var.has_value "${REMOTE_AGENTS}"; then
-        DOZZLE_REMOTE_AGENT="${REMOTE_AGENTS}" \
+        DOZZLE_BASE="/" DOZZLE_REMOTE_AGENT="${REMOTE_AGENTS}" \
             /usr/local/bin/dozzle "${DIRECT_ARGS[@]}" &
     else
-        /usr/local/bin/dozzle "${DIRECT_ARGS[@]}" &
+        DOZZLE_BASE="/" /usr/local/bin/dozzle "${DIRECT_ARGS[@]}" &
     fi
 fi
 
