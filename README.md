@@ -1,7 +1,7 @@
 # Home Assistant Add-on Repository: Dozzle
 
 <div align="center">
-<img src="https://raw.githubusercontent.com/Erreur32/homeassistant-dozzle-agent/refs/heads/main/dozzle-agent/dozzle.svg" alt="Dozzle" width="128" height="128">
+<img src="https://raw.githubusercontent.com/amir20/dozzle/master/assets/logo.svg" alt="Dozzle" width="128" height="128">
 
 <h2>Dozzle</h2>
 
@@ -24,8 +24,8 @@ This repository ships the **Dozzle** **Home Assistant App** (formerly “add-on�
 
 | | |
 | --- | --- |
-| **Packaged app version** | `0.2.0` (see [`dozzle/config.yaml`](dozzle/config.yaml)) |
-| **Bundled Dozzle binary** | `v10.2.1` (see [`dozzle/Dockerfile`](dozzle/Dockerfile)) |
+| **Packaged app version** | `0.2.1` (see [`dozzle/config.yaml`](dozzle/config.yaml)) |
+| **Bundled Dozzle binary** | `v10.3.0` (see [`dozzle/Dockerfile`](dozzle/Dockerfile)) |
 | **Container image** | `ghcr.io/erreur32/homeassistant-dozzle` |
 
 [Dozzle](https://github.com/amir20/dozzle) is a lightweight tool to **stream and search Docker container logs** in real time. This packaging connects to the host Docker engine via the Supervisor (`docker_api`), serves the UI through **Ingress** (`ingress_stream`), and can run an optional **embedded agent** or connect to **remote agents**.
@@ -85,23 +85,23 @@ Configurable in the Supervisor UI after install. Full reference: [`dozzle/DOCS.m
 
 | Option | Purpose |
 | --- | --- |
-| `log_level` | Process log verbosity: `trace` … `fatal` |
+| `log_level` | Process log verbosity: `trace` ... `fatal` |
 | `filter` | Optional Docker filter (same idea as `docker ps --filter`) |
 | `no_analytics` | Disable anonymous Dozzle usage stats |
 | `enable_actions` | Allow container start/stop from the UI (use carefully) |
+| `enable_direct_access` | Expose Dozzle on port **8088** for direct browser access without Ingress |
 | `enable_agent` | Run embedded Dozzle agent for remote instances |
-| `agent_port` | Agent listen port (default **7007**) |
 | `agent_hostname` | Label for this agent in remote UIs |
 | `remote_agents` | Remote `host:port` list (comma-separated) |
 
-**Ports (optional):** **8080** - direct web access in addition to Ingress; **7007** - agent, only if the embedded agent is enabled and you map the port.
+**Ports (optional):** **8088** - direct web access (when `enable_direct_access` is true); **7007** - agent, only if the embedded agent is enabled and you map the port.
 
 ---
 
 ## Usage
 
 - **Default:** open **Dozzle** from the menu; traffic uses **Ingress** on internal port **8080**.
-- **Direct access:** map **8080/tcp** on the host if you want a URL outside the HA UI.
+- **Direct access:** enable `enable_direct_access` in options, then map **8088/tcp** in the Network tab.
 - **Agent:** enable in options, map **7007/tcp**; connect from another Dozzle with `DOZZLE_REMOTE_AGENT=<ha-ip>:<mapped-port>`.
 
 Example environment for a standalone Dozzle container talking to remote agents:
@@ -148,8 +148,8 @@ Repository packaging: see [LICENSE][license] when present in the repo. Upstream 
 [license]: https://github.com/Erreur32/homeassistant-dozzle/blob/main/LICENSE
 [maintenance-shield]: https://img.shields.io/maintenance/yes/2026.svg
 [project-stage-shield]: https://img.shields.io/badge/project%20stage-stable-green.svg
-[release-shield]: https://img.shields.io/badge/version-v0.2.0-blue.svg
-[release]: https://github.com/Erreur32/homeassistant-dozzle/releases/tag/v0.2.0
+[release-shield]: https://img.shields.io/badge/version-v0.2.1-blue.svg
+[release]: https://github.com/Erreur32/homeassistant-dozzle/releases/tag/v0.2.1
 [license-shield]: https://img.shields.io/badge/license-MIT-blue.svg
 [issues-shield]: https://img.shields.io/github/issues/Erreur32/homeassistant-dozzle.svg
 [stars-shield]: https://img.shields.io/github/stars/Erreur32/homeassistant-dozzle.svg

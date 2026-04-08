@@ -4,6 +4,14 @@ All notable changes to this repository ([homeassistant-dozzle](https://github.co
 
 ---
 
+## 0.2.1 - 2026-04-08
+
+- **Fix direct access (blank page):** add WebSocket upgrade headers (`Upgrade`, `Connection`) to the direct-access nginx config - Dozzle uses WebSockets for log streaming; without these headers the page loaded but stayed blank because the real-time connection could not be established.
+- **Fix direct access startup:** nginx now waits for the direct-access Dozzle instance (`:8082`) to be ready before starting, preventing 502 errors on first load.
+- **Icon:** sidebar icon changed from `mdi:text-box-search-outline` to `mdi:docker`.
+
+---
+
 ## 0.1.9 - 2026-04-06
 
 - **Fix nginx:** restore `user root;` - reverts 0.1.7/0.1.8 attempts; `initgroups(root, 0) failed` is a harmless cosmetic log line (nginx is already root, no privilege drop occurs); the `chown()` fatal error only happens without `user root;`.

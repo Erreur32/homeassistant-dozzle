@@ -17,17 +17,24 @@ configuration:
     name: Actions sur les conteneurs
     description: Autorise redémarrage / arrêt depuis l’interface (à utiliser avec prudence).
   enable_agent:
-    name: Agent intégré
-    description: Lance « dozzle agent » dans l’add-on pour que d’autres instances Dozzle puissent se connecter à cet hôte (mappez le port agent hôte si besoin).
-  agent_port:
-    name: Port de l’agent
-    description: Port d’écoute de l’agent (défaut 7007). À mapper dans l’onglet « Configuration » de l’add-on si accès depuis l’extérieur.
+    name: "Agent intégré - exposer cet hôte HA aux instances Dozzle distantes"
+    description: >
+      Lance un agent Dozzle sur le port 7007 (fixe).
+      Utilisez cette option quand une autre instance Dozzle sur une AUTRE machine
+      doit voir les conteneurs de cet hôte HA. Mappez le port 7007 dans l’onglet
+      Réseau pour l’accès externe.
+      Pas nécessaire pour voir les conteneurs HA ici - le socket Docker s’en charge.
   agent_hostname:
-    name: Nom affiché de l’agent
-    description: Libellé optionnel pour cet agent dans l’interface Dozzle distante.
+    name: "Nom affiché de l’agent"
+    description: >
+      Libellé affiché pour cet hôte dans les interfaces Dozzle distantes
+      (ex. "homeassistant"). Laisser vide pour utiliser le nom d’hôte par défaut.
   remote_agents:
-    name: Agents distants
-    description: Liste host:port séparée par des virgules pour afficher des conteneurs d’autres machines (ex. 192.168.1.10:7007).
+    name: "Agents distants - ajouter d’autres hôtes Docker"
+    description: >
+      Liste host:port séparée par des virgules pointant vers des agents Dozzle
+      sur d’AUTRES machines (ex. 192.168.1.10:7007,192.168.1.20:7007).
+      Ces conteneurs apparaitront aux côtés des conteneurs HA dans cet add-on.
   enable_direct_access:
     name: Accès direct (port 8088)
     description: Expose Dozzle sur le port 8088 sans le préfixe token Ingress, accessible via http://ip-ha:8088/. Mappez le port 8088 dans l’onglet Réseau. Ingress continue de fonctionner normalement en parallèle.

@@ -1,4 +1,4 @@
-![Dozzle](https://raw.githubusercontent.com/Erreur32/homeassistant-dozzle/main/dozzle/logo.png)
+![Dozzle](https://raw.githubusercontent.com/amir20/dozzle/master/assets/logo.svg)
 
 # Dozzle - Real-time Docker log viewer
 
@@ -20,7 +20,7 @@
 2. Install **Dozzle** - do **not** start it yet.
 3. On the add-on page: **disable Protection mode** (toggle in the top-right area).
 4. Click **Start**, then open **Dozzle** from the sidebar.
-5. *(Optional)* map host port **8080** in the Network tab for direct access outside Ingress.
+5. *(Optional)* enable `enable_direct_access` in options, then map port **8088** in the Network tab for direct access outside Ingress.
 
 ---
 
@@ -32,6 +32,7 @@
 | `filter` | string | *(empty)* | Docker filter string (same syntax as `docker ps --filter`) |
 | `no_analytics` | bool | `true` | Disable anonymous Dozzle analytics |
 | `enable_actions` | bool | `false` | Allow restart/stop actions from the UI *(use with care)* |
+| `enable_direct_access` | bool | `false` | Expose Dozzle on port **8088** for direct browser access without Ingress |
 | `enable_agent` | bool | `false` | Expose this HA host to a remote Dozzle instance (see Agent section) |
 | `agent_hostname` | string | *(empty)* | Display name for this node in remote Dozzle UIs |
 | `remote_agents` | string | *(empty)* | Comma-separated `host:port` list of remote agents to aggregate here |
@@ -42,7 +43,8 @@
 
 | Port | Purpose |
 |------|---------|
-| `8080/tcp` | Web UI - optional direct mapping; Ingress uses this internally |
+| `8080/tcp` | Ingress proxy (internal - do not map) |
+| `8088/tcp` | Direct web access - map when `enable_direct_access: true` |
 | `7007/tcp` | Built-in agent - map only when `enable_agent: true` |
 
 ---
@@ -93,6 +95,7 @@ Access goes through **HA Ingress** - your existing Home Assistant session is use
 | Blank page / broken stream | Check `ingress_stream: true` in the manifest and reload |
 | No containers listed | Docker socket access requires Protection mode OFF |
 | 403 pulling image | Make the GHCR package public: GitHub -> Packages -> homeassistant-dozzle -> Package settings -> Public |
+| Direct access blank page | Enable `enable_direct_access` in options **and** map port `8088/tcp` in the Network tab |
 | Agent not reachable from outside | Go to Network tab, set a host port for `7007/tcp` (not mapped by default) |
 
 For the full release history see [`CHANGELOG.md`](CHANGELOG.md).

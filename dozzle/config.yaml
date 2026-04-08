@@ -2,7 +2,7 @@
 # https://developers.home-assistant.io/docs/apps/configuration
 # Do not use the `advanced` key (deprecated since Supervisor 2026.03.0).
 name: "Dozzle"
-version: "0.2.0"
+version: "0.2.1"
 slug: "dozzle"
 description: "Real-time Docker log viewer (Ingress, optional agent)"
 # Project page (support / source of the packaged app for HA)
@@ -29,7 +29,7 @@ ingress_entry: /
 ingress_stream: true
 
 panel_title: "Dozzle"
-panel_icon: "mdi:text-box-search-outline"
+panel_icon: "mdi:docker"
 
 watchdog: "http://[HOST]:[PORT:8080]/"
 

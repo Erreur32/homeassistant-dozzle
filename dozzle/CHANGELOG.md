@@ -6,6 +6,14 @@ A copy also lives at the repository root: [`CHANGELOG.md`](../CHANGELOG.md).
 
 ---
 
+## 0.2.1 - 2026-04-08
+
+- **Fix direct access (blank page):** add WebSocket upgrade headers (`Upgrade`, `Connection`) to the direct-access nginx config - Dozzle uses WebSockets for log streaming; without these headers the page loaded but stayed blank because the real-time connection could not be established.
+- **Fix direct access startup:** nginx now waits for the direct-access Dozzle instance (`:8082`) to be ready before starting, preventing 502 errors on first load.
+- **Icon:** sidebar icon changed from `mdi:text-box-search-outline` to `mdi:docker` (closer to Dozzle's purpose).
+
+---
+
 ## 0.2.0 - 2026-04-06
 
 - **New option `enable_direct_access`:** expose Dozzle on port 8088 for direct browser access without the Ingress token prefix. When enabled, a second Dozzle instance starts on `:8082` with `--base /`; nginx serves it on `:8088` without the ingress rewrite. Map port 8088 in the Network tab to use it. Ingress continues to work normally alongside this.

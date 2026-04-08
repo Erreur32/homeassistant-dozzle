@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://raw.githubusercontent.com/Erreur32/homeassistant-dozzle/main/dozzle/icon.png" alt="Dozzle" width="100" height="100">
+<img src="https://raw.githubusercontent.com/amir20/dozzle/master/assets/logo.svg" alt="Dozzle" width="100" height="100">
 
 # Dozzle - Home Assistant App
 
@@ -19,7 +19,7 @@
 
 | | |
 |---|---|
-| **Version** | `0.2.0` |
+| **Version** | `0.2.1` |
 | **Dozzle binary** | `v10.2.1` |
 | **Architectures** | `amd64` · `aarch64` |
 | **Image** | `ghcr.io/erreur32/homeassistant-dozzle` |
@@ -40,8 +40,8 @@ Full documentation: [`DOCS.md`](DOCS.md) · Release history: [`CHANGELOG.md`](CH
 
 ---
 
-[release-shield]: https://img.shields.io/badge/version-v0.2.0-blue.svg
-[release]: https://github.com/Erreur32/homeassistant-dozzle/releases/tag/v0.2.0
+[release-shield]: https://img.shields.io/badge/version-v0.2.1-blue.svg
+[release]: https://github.com/Erreur32/homeassistant-dozzle/releases/tag/v0.2.1
 [project-stage-shield]: https://img.shields.io/badge/project%20stage-stable-green.svg
 [maintenance-shield]: https://img.shields.io/maintenance/yes/2026.svg
 [license-shield]: https://img.shields.io/badge/license-MIT-blue.svg
