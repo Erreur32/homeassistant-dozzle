@@ -1,4 +1,4 @@
-![Dozzle](https://raw.githubusercontent.com/amir20/dozzle/master/assets/logo.svg)
+<img src="https://raw.githubusercontent.com/amir20/dozzle/master/assets/logo.svg" alt="Dozzle" width="80">
 
 # Dozzle - Real-time Docker log viewer
 

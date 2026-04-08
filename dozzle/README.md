@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://raw.githubusercontent.com/amir20/dozzle/master/assets/logo.svg" alt="Dozzle" width="100" height="100">
+<img src="https://raw.githubusercontent.com/amir20/dozzle/master/assets/logo.svg" alt="Dozzle" width="80">
 
 # Dozzle - Home Assistant App
 

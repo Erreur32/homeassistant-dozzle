@@ -1,7 +1,7 @@
 # Home Assistant Add-on Repository: Dozzle
 
 <div align="center">
-<img src="https://raw.githubusercontent.com/amir20/dozzle/master/assets/logo.svg" alt="Dozzle" width="128" height="128">
+<img src="https://raw.githubusercontent.com/amir20/dozzle/master/assets/logo.svg" alt="Dozzle" width="80">
 
 <h2>Dozzle</h2>
 
