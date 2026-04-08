@@ -36,7 +36,7 @@ watchdog: "http://[HOST]:[PORT:8080]/"
 ports:
   8080/tcp: null
   7007/tcp: null
-  8088/tcp: null
+  8088/tcp: 8088
 ports_description:
   8080/tcp: "Web UI ingress proxy (do not map - use port 8088 for direct access)"
   7007/tcp: "Dozzle agent - map only if the built-in agent is enabled"
