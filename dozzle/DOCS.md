@@ -1,4 +1,4 @@
-<img src="https://raw.githubusercontent.com/amir20/dozzle/master/assets/logo.svg" alt="Dozzle" width="80">
+<img src="https://raw.githubusercontent.com/Erreur32/homeassistant-dozzle/main/logo.svg" alt="Dozzle" width="80">
 
 # Dozzle - Real-time Docker log viewer
 
