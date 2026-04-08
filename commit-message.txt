@@ -1,8 +1,4 @@
-release: v0.2.1
+release: v0.2.2
 
-- fix(direct-access): add WebSocket upgrade headers to nginx - fixes blank page
-- fix(direct-access): wait for Dozzle :8082 before starting nginx
-- icon: sidebar changed to mdi:docker
-- docs: update README, DOCS, translations (port 8088, enable_direct_access, remove agent_port)
-- docs: use official Dozzle SVG logo from upstream
-- Dozzle binary: v10.2.1 -> v10.3.0
+- New polygonal Dozzle icon/logo
+- Docs: use project SVG logo instead of upstream

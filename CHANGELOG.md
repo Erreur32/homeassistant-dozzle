@@ -4,6 +4,13 @@ All notable changes to this repository ([homeassistant-dozzle](https://github.co
 
 ---
 
+## 0.2.2 - 2026-04-08
+
+- **Icons:** new polygonal Dozzle mascot for `icon.png`, `logo.png` and SVG logo.
+- **Docs:** README, DOCS, and addon README now use project SVG logo (`logo.svg`) instead of upstream.
+
+---
+
 ## 0.2.1 - 2026-04-08
 
 - **Fix direct access (blank page):** add WebSocket upgrade headers (`Upgrade`, `Connection`) to the direct-access nginx config - Dozzle uses WebSockets for log streaming; without these headers the page loaded but stayed blank because the real-time connection could not be established.
