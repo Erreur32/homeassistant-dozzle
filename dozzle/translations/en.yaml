@@ -1,3 +1,4 @@
+---
 network:
   8080/tcp: "Ingress proxy - do not map directly, use port 8088 for external access."
   7007/tcp: "Dozzle agent port - map this only when 'Built-in agent' option is enabled."

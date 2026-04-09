@@ -1,5 +1,8 @@
 name: Lint
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 on:
   pull_request:
     branches:
@@ -25,6 +28,9 @@ jobs:
         uses: hadolint/hadolint-action@54c9adbab1582c2ef04b2016b760714a4bfde3cf # v3.1.0
         with:
           dockerfile: dozzle/Dockerfile
+          # DL3006: FROM with ARG tag is fine (DOZZLE_VERSION build arg)
+          # DL3018: pinning apk versions is impractical with rolling HA base images
+          ignore: DL3006,DL3018
 
   shellcheck:
     name: Shell scripts
