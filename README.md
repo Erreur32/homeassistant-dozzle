@@ -131,6 +131,10 @@ Report issues on the [GitHub issue tracker][issue].
 
 Pull requests and improvements are welcome.
 
+## Acknowledgments
+
+Thanks to [@JZ-SmartThings](https://github.com/JZ-SmartThings) for reporting and thoroughly investigating the notification persistence issue ([#1](https://github.com/Erreur32/homeassistant-dozzle/issues/1)).
+
 ## Authors
 
 Packaging: [Erreur32][erreur32]. Upstream Dozzle: [Amir Raminfar](https://github.com/amir20) and [contributors](https://github.com/amir20/dozzle/graphs/contributors).  
