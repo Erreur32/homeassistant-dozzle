@@ -4,6 +4,12 @@ All notable changes to this repository ([homeassistant-dozzle](https://github.co
 
 ---
 
+## 0.2.5 - 2026-04-09
+
+- **Fix log filter through ingress:** added WebSocket upgrade support to the ingress nginx proxy - Dozzle uses WebSocket for log filtering/searching, which was silently dropped by the proxy. (#2)
+
+---
+
 ## 0.2.4 - 2026-04-09
 
 - **Fix notification/alert persistence:** Dozzle stores data (notifications, webhooks, alerts) using a relative `./data/` path - the working directory was not explicitly set, so data landed outside the persistent `/data` volume and was lost on every restart. Added `cd /` before launch so `./data/` resolves to the Supervisor-managed persistent volume. (#1)

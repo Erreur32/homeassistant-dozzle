@@ -1,3 +1,8 @@
-release: v0.2.4
+release: v0.2.5
 
-- Fix notification/alert data persistence across restarts (#1)
+fix: add WebSocket upgrade support to ingress proxy (#2)
+
+- Dozzle log filter/search requires WebSocket, which the ingress
+  nginx proxy was silently dropping (missing Upgrade headers).
+- Move WebSocket map to nginx.conf (shared by ingress + direct access).
+- Remove duplicate map from direct_access.conf template.
