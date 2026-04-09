@@ -1,9 +1,8 @@
-release: v0.2.6
+release: v0.2.7
 
-fix: disable gzip on SSE streams to fix alerts/log filters through ingress (#2)
+fix: revert WebSocket headers that broke ingress proxy (#2)
 
-Dozzle uses SSE (not WebSocket) for log streaming and alerts.
-When gzip is advertised, Dozzle compresses the SSE stream, which
-the HA Supervisor aiohttp proxy buffers instead of streaming.
-Strip Accept-Encoding so SSE flows as plain text through the
-entire proxy chain.
+The Upgrade/Connection headers added in v0.2.5 caused
+"Cannot write to closing transport" errors in the HA Supervisor
+aiohttp proxy. Dozzle uses SSE, not WebSocket - reverted to
+Connection '' (keep-alive). Accept-Encoding "" fix preserved.

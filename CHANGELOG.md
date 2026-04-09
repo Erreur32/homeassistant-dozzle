@@ -4,9 +4,15 @@ All notable changes to this repository ([homeassistant-dozzle](https://github.co
 
 ---
 
+## 0.2.7 - 2026-04-09
+
+- **Fix ingress broken by v0.2.5/v0.2.6:** the WebSocket upgrade headers (`Upgrade`, `Connection $connection_upgrade`) added in v0.2.5 broke the HA Supervisor aiohttp ingress proxy, causing `Cannot write to closing transport` errors on SSE streams and a blank Dozzle panel. Reverted to `Connection ''` (keep-alive without upgrade) which is what Dozzle actually needs - it uses SSE, not WebSocket, for log streaming and alert notifications. The `Accept-Encoding ""` fix for gzip-compressed SSE (#2) is preserved. (#2)
+
+---
+
 ## 0.2.6 - 2026-04-09
 
-- **Fix SSE streaming through ingress (alerts, log filters):** Dozzle uses Server-Sent Events (not WebSocket) for log streaming and alert notifications. When the client advertises gzip support, Dozzle compresses the SSE stream - the HA Supervisor proxy (aiohttp with `auto_decompress`) then buffers the compressed chunks instead of forwarding them in real-time. Strip `Accept-Encoding` in the nginx proxy so Dozzle sends plain-text SSE that flows cleanly through the entire proxy chain. Also align `proxy_send_timeout` with `proxy_read_timeout` for long-lived SSE connections. (#2)
+- **Fix SSE streaming through ingress (alerts, log filters):** strip `Accept-Encoding` in the nginx proxy so Dozzle sends plain-text SSE instead of gzip - the HA Supervisor aiohttp proxy cannot handle gzip-encoded SSE streams. (#2)
 
 ---
 
