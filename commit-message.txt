@@ -1,5 +1,3 @@
-release: v0.2.3
+release: v0.2.4
 
-- fix(direct-access): override DOZZLE_BASE="/" for direct-access instance
-  Global export DOZZLE_BASE (ingress token) was overriding --base / CLI flag,
-  causing 404 on all assets via port 8088.
+- Fix notification/alert data persistence across restarts (#1)
