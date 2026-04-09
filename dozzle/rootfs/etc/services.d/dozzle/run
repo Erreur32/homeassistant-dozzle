@@ -9,6 +9,11 @@
 
 set -e
 
+# Dozzle stores persistent data (notifications, alerts) in ./data/ (relative).
+# The HA Supervisor mounts /data as a persistent volume, so we must ensure
+# the working directory is / so that ./data/ resolves to /data/.
+cd /
+
 declare -a DOZZLE_ARGS
 declare DOZZLE_ADDR
 declare LOG_LEVEL
