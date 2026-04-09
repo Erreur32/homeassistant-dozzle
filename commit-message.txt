@@ -1,8 +1,9 @@
-release: v0.2.5
+release: v0.2.6
 
-fix: add WebSocket upgrade support to ingress proxy (#2)
+fix: disable gzip on SSE streams to fix alerts/log filters through ingress (#2)
 
-- Dozzle log filter/search requires WebSocket, which the ingress
-  nginx proxy was silently dropping (missing Upgrade headers).
-- Move WebSocket map to nginx.conf (shared by ingress + direct access).
-- Remove duplicate map from direct_access.conf template.
+Dozzle uses SSE (not WebSocket) for log streaming and alerts.
+When gzip is advertised, Dozzle compresses the SSE stream, which
+the HA Supervisor aiohttp proxy buffers instead of streaming.
+Strip Accept-Encoding so SSE flows as plain text through the
+entire proxy chain.

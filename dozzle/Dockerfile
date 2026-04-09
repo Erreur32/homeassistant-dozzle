@@ -10,7 +10,7 @@ FROM amir20/dozzle:${DOZZLE_VERSION} AS dozzle_upstream
 
 FROM ${BUILD_FROM}
 
-ARG BUILD_VERSION=0.2.5
+ARG BUILD_VERSION=0.2.6
 ARG BUILD_ARCH=amd64
 
 # Expose build versions as runtime env vars (readable in run scripts / logs)

@@ -6,9 +6,15 @@ A copy also lives at the repository root: [`CHANGELOG.md`](../CHANGELOG.md).
 
 ---
 
+## 0.2.6 - 2026-04-09
+
+- **Fix SSE streaming through ingress (alerts, log filters):** Dozzle uses Server-Sent Events (not WebSocket) for log streaming and alert notifications. When the client advertises gzip support, Dozzle compresses the SSE stream - the HA Supervisor proxy (aiohttp with `auto_decompress`) then buffers the compressed chunks instead of forwarding them in real-time. Strip `Accept-Encoding` in the nginx proxy so Dozzle sends plain-text SSE that flows cleanly through the entire proxy chain. Also align `proxy_send_timeout` with `proxy_read_timeout` for long-lived SSE connections. (#2)
+
+---
+
 ## 0.2.5 - 2026-04-09
 
-- **Fix log filter through ingress:** added WebSocket upgrade support to the ingress nginx proxy - Dozzle uses WebSocket for log filtering/searching, which was silently dropped by the proxy. (#2)
+- **WebSocket upgrade headers:** added WebSocket upgrade support to the ingress nginx proxy.
 
 ---
 
