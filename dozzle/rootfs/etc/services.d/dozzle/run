@@ -137,6 +137,65 @@ if bashio::var.true "${ENABLE_AGENT}"; then
     bashio::log.info "Built-in agent ready on port 7007"
 fi
 
+# --- Notification config status (pre-start) ----------------------------------
+NOTIF_CONFIG="/data/notifications.yml"
+if [ -f "${NOTIF_CONFIG}" ]; then
+    NOTIF_RULES=$(grep -c '^ *logExpression:' "${NOTIF_CONFIG}" 2>/dev/null || echo "0")
+    NOTIF_DISPATCHERS=$(grep -c '^ *type: webhook' "${NOTIF_CONFIG}" 2>/dev/null || echo "0")
+    bashio::log.info "Notification config: ${NOTIF_CONFIG} (${NOTIF_RULES} rule(s), ${NOTIF_DISPATCHERS} webhook(s))"
+else
+    bashio::log.info "Notification config: none (create alerts in the Dozzle UI)"
+fi
+
+# --- Background notification diagnostic (debug mode only) --------------------
+# After Dozzle starts, query the notification API to verify the alert engine
+# is running. This helps diagnose issues where alerts don't trigger.
+if [ "${LOG_LEVEL}" = "debug" ] || [ "${LOG_LEVEL}" = "trace" ]; then
+    (
+        # Wait for Dozzle to accept connections
+        for _i in $(seq 1 20); do
+            if curl -sf --max-time 2 "http://127.0.0.1:8081${INGRESS_ENTRY}/healthcheck" >/dev/null 2>&1; then
+                break
+            fi
+            sleep 1
+        done
+
+        # Query notification API
+        RULES_JSON=$(curl -sf --max-time 5 "http://127.0.0.1:8081${INGRESS_ENTRY}/api/notifications/rules" 2>/dev/null)
+        DISPATCHERS_JSON=$(curl -sf --max-time 5 "http://127.0.0.1:8081${INGRESS_ENTRY}/api/notifications/dispatchers" 2>/dev/null)
+
+        if [ -n "${RULES_JSON}" ]; then
+            RULE_COUNT=$(echo "${RULES_JSON}" | jq 'length' 2>/dev/null || echo "?")
+            bashio::log.info "[notif-diag] Notification rules loaded: ${RULE_COUNT}"
+            # Show each rule's name, enabled state, and trigger count
+            echo "${RULES_JSON}" | jq -r '.[] | "  - \(.name) | enabled=\(.enabled) | triggers=\(.triggerCount) | containers=\(.triggeredContainers) | container_expr=\"\(.containerExpression)\" | log_expr=\"\(.logExpression)\""' 2>/dev/null | while read -r line; do
+                bashio::log.info "[notif-diag] ${line}"
+            done
+        else
+            bashio::log.warning "[notif-diag] Could not query notification rules API"
+        fi
+
+        if [ -n "${DISPATCHERS_JSON}" ]; then
+            DISP_COUNT=$(echo "${DISPATCHERS_JSON}" | jq 'length' 2>/dev/null || echo "?")
+            bashio::log.info "[notif-diag] Dispatchers configured: ${DISP_COUNT}"
+            echo "${DISPATCHERS_JSON}" | jq -r '.[] | "  - \(.name) | type=\(.type)"' 2>/dev/null | while read -r line; do
+                bashio::log.info "[notif-diag] ${line}"
+            done
+            if [ "${DISP_COUNT}" = "0" ]; then
+                bashio::log.warning "[notif-diag] No webhook dispatchers configured - alerts will match but notifications go nowhere"
+            fi
+        else
+            bashio::log.warning "[notif-diag] Could not query dispatchers API"
+        fi
+
+        # Check container count visible to Dozzle
+        EVENTS_CHECK=$(curl -sf --max-time 3 "http://127.0.0.1:8081${INGRESS_ENTRY}/api/version" 2>/dev/null)
+        if [ -n "${EVENTS_CHECK}" ]; then
+            bashio::log.info "[notif-diag] Dozzle API responding OK"
+        fi
+    ) &
+fi
+
 # --- Startup banner ----------------------------------------------------------
 bashio::log.info "================================================"
 bashio::log.info "  Dozzle for Home Assistant"
@@ -144,7 +203,7 @@ bashio::log.info "  App version  : ${BUILD_VERSION:-unknown}"
 bashio::log.info "  Dozzle binary: ${HA_DOZZLE_BIN_VERSION:-unknown}"
 bashio::log.info "------------------------------------------------"
 bashio::log.info "  Ingress base : ${INGRESS_ENTRY}"
-bashio::log.info "  Listen addr  : ${DOZZLE_ADDR} (nginx :8080 → here)"
+bashio::log.info "  Listen addr  : ${DOZZLE_ADDR} (nginx :8080 -> here)"
 bashio::log.info "  Log level    : ${LOG_LEVEL}"
 bashio::log.info "  Filter       : ${FILTER:-none}"
 bashio::log.info "  Actions      : ${ENABLE_ACTIONS}"

@@ -4,6 +4,13 @@ All notable changes to this repository ([homeassistant-dozzle](https://github.co
 
 ---
 
+## 0.2.8 - 2026-04-10
+
+- **Docs: alerts / log filters guide:** added documentation section explaining how the notification system works (dispatcher + rule setup), expression syntax with examples, and case-sensitivity gotchas. (#2)
+- **Diagnostic: notification system status at startup:** logs whether `/data/notifications.yml` exists with rule/dispatcher counts. In debug mode, queries the notification API after startup and logs detailed rule state (name, enabled, trigger count, expressions) tagged `[notif-diag]`. (#2)
+
+---
+
 ## 0.2.7 - 2026-04-09
 
 - **Fix ingress broken by v0.2.5/v0.2.6:** the WebSocket upgrade headers (`Upgrade`, `Connection $connection_upgrade`) added in v0.2.5 broke the HA Supervisor aiohttp ingress proxy, causing `Cannot write to closing transport` errors on SSE streams and a blank Dozzle panel. Reverted to `Connection ''` (keep-alive without upgrade) which is what Dozzle actually needs - it uses SSE, not WebSocket, for log streaming and alert notifications. The `Accept-Encoding ""` fix for gzip-compressed SSE (#2) is preserved. (#2)

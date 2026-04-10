@@ -87,6 +87,40 @@ Access goes through **HA Ingress** - your existing Home Assistant session is use
 
 ---
 
+## Alerts / Log Filters (notifications)
+
+Dozzle has a built-in alert engine that monitors container logs server-side and sends **webhook notifications** when expressions match. This works independently of the log viewer UI.
+
+### How it works
+
+1. **Create a dispatcher** (Settings > Notifications > Dispatchers): add a webhook URL where alerts should be sent (e.g. Home Assistant webhook, Slack, Discord, ntfy...).
+2. **Create a notification rule** (Settings > Notifications > Rules):
+   - **Container expression** - which containers to monitor, e.g. `name contains "guacamole"`
+   - **Log expression** - what to match in the logs, e.g. `message contains "authentication failure"`
+3. When a **new** log entry matches both expressions, Dozzle sends a POST to your webhook URL.
+
+### Important notes
+
+- Alerts only match **new** log entries (after the rule is created/loaded). Existing logs are not scanned retroactively.
+- A **webhook dispatcher must exist** before alerts can fire. Without one, rules will match but notifications go nowhere.
+- The alert engine runs **server-side** via Docker socket - it opens its own log streams, separate from the browser UI.
+- To debug alerts, set `log_level: debug` in the add-on config. The logs will show container matching, expression evaluation, and webhook dispatch results.
+
+### Expression syntax
+
+Dozzle uses [expr-lang](https://expr-lang.org/) expressions. Examples:
+
+| Type | Example |
+|------|---------|
+| Container | `name contains "nginx"` |
+| Container | `image contains "guacamole" && state == "running"` |
+| Log (text) | `message contains "error"` |
+| Log (text) | `message contains "authentication failure"` |
+| Log (JSON) | `message.level == "error"` |
+| Log (regex) | `message matches "WARN\|ERROR\|FATAL"` |
+
+---
+
 ## Troubleshooting
 
 | Symptom | Fix |
@@ -97,5 +131,6 @@ Access goes through **HA Ingress** - your existing Home Assistant session is use
 | 403 pulling image | Make the GHCR package public: GitHub -> Packages -> homeassistant-dozzle -> Package settings -> Public |
 | Direct access blank page | Enable `enable_direct_access` in options **and** map port `8088/tcp` in the Network tab |
 | Agent not reachable from outside | Go to Network tab, set a host port for `7007/tcp` (not mapped by default) |
+| **Alerts not triggering** | 1) Verify a webhook dispatcher exists. 2) Set `log_level: debug` and check addon logs for `[notif-diag]` messages. 3) Alerts only match NEW log entries, not existing ones. |
 
 For the full release history see [`CHANGELOG.md`](CHANGELOG.md).
