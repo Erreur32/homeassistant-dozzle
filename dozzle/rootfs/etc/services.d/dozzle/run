@@ -5,6 +5,8 @@
 #          Dozzle on :8081 runs with --base TOKEN_PATH so all asset/API
 #          URLs are correctly scoped to the Ingress URL.
 # Agent:   optional built-in dozzle agent on port 7007 (enable_agent option)
+# Agent-only mode: set enable_master=false + enable_agent=true to run
+#          only the agent (no UI, no nginx). Replaces the standalone agent addon.
 # ==============================================================================
 
 set -e
@@ -22,8 +24,11 @@ declare NO_ANALYTICS
 declare ENABLE_ACTIONS
 declare INGRESS_ENTRY
 declare REMOTE_AGENTS
+declare ENABLE_MASTER
 declare ENABLE_AGENT
 declare AGENT_HOSTNAME
+declare AGENT_CERT
+declare AGENT_KEY
 declare ENABLE_DIRECT_ACCESS
 
 # --- Docker socket (docker_api: true in config.yaml) -------------------------
@@ -52,10 +57,71 @@ LOG_LEVEL="$(bashio::config 'log_level' 'info')"
 FILTER="$(bashio::config 'filter' '')"
 NO_ANALYTICS="$(bashio::config 'no_analytics' 'true')"
 ENABLE_ACTIONS="$(bashio::config 'enable_actions' 'false')"
+ENABLE_MASTER="$(bashio::config 'enable_master' 'true')"
 ENABLE_AGENT="$(bashio::config 'enable_agent' 'false')"
 AGENT_HOSTNAME="$(bashio::config 'agent_hostname' '')"
+AGENT_CERT="$(bashio::config 'agent_cert' '')"
+AGENT_KEY="$(bashio::config 'agent_key' '')"
 REMOTE_AGENTS="$(bashio::config 'remote_agents' '')"
 ENABLE_DIRECT_ACCESS="$(bashio::config 'enable_direct_access' 'false')"
+
+# --- Custom TLS certificates -------------------------------------------------
+# Dozzle agent uses gRPC over TLS. By default it uses SHARED certs compiled
+# into the binary (any Dozzle instance worldwide can connect).
+# Custom certs restrict connections to instances sharing the same key pair.
+# Both the agent AND the master need the same certs to communicate.
+# Place your cert/key files in the HA /ssl/ directory.
+if bashio::var.has_value "${AGENT_CERT}" && bashio::var.has_value "${AGENT_KEY}"; then
+    if [ -f "/ssl/${AGENT_CERT}" ] && [ -f "/ssl/${AGENT_KEY}" ]; then
+        cp "/ssl/${AGENT_CERT}" /dozzle_cert.pem
+        cp "/ssl/${AGENT_KEY}" /dozzle_key.pem
+        bashio::log.info "Custom TLS certs loaded from /ssl/${AGENT_CERT}, /ssl/${AGENT_KEY}"
+    else
+        bashio::log.error "TLS cert files not found in /ssl/:"
+        bashio::log.error "  cert: /ssl/${AGENT_CERT} (exists: $([ -f "/ssl/${AGENT_CERT}" ] && echo yes || echo NO))"
+        bashio::log.error "  key:  /ssl/${AGENT_KEY} (exists: $([ -f "/ssl/${AGENT_KEY}" ] && echo yes || echo NO))"
+    fi
+else
+    bashio::log.info "Agent TLS: default shared certs (any Dozzle instance can connect)"
+fi
+
+# ==============================================================================
+# AGENT-ONLY MODE
+# When enable_master=false and enable_agent=true, skip the UI and nginx entirely.
+# This replicates the behavior of the standalone dozzle-agent addon.
+# ==============================================================================
+if ! bashio::var.true "${ENABLE_MASTER}"; then
+    if bashio::var.true "${ENABLE_AGENT}"; then
+        bashio::log.info "================================================"
+        bashio::log.info "  Dozzle - AGENT-ONLY MODE"
+        bashio::log.info "  App version  : ${BUILD_VERSION:-unknown}"
+        bashio::log.info "  Dozzle binary: ${HA_DOZZLE_BIN_VERSION:-unknown}"
+        bashio::log.info "------------------------------------------------"
+        bashio::log.info "  Agent        : 0.0.0.0:7007 (map port 7007 in Network tab)"
+        bashio::log.info "  Agent name   : ${AGENT_HOSTNAME:-default}"
+        bashio::log.info "  Log level    : ${LOG_LEVEL}"
+        bashio::log.info "  TLS certs    : $([ -f /dozzle_cert.pem ] && echo custom || echo shared)"
+        bashio::log.info "  Master UI    : disabled"
+        bashio::log.info "  Nginx        : disabled"
+        bashio::log.info "================================================"
+
+        if bashio::var.has_value "${AGENT_HOSTNAME}"; then
+            export DOZZLE_HOSTNAME="${AGENT_HOSTNAME}"
+        fi
+        export DOZZLE_LEVEL="${LOG_LEVEL}"
+
+        # Agent is the foreground process (no &) so s6 supervises it
+        exec /usr/local/bin/dozzle agent --addr "0.0.0.0:7007" --level "${LOG_LEVEL}"
+    else
+        bashio::log.error "enable_master=false but enable_agent=false - nothing to run!"
+        bashio::log.error "Enable either the master UI or the agent (or both)."
+        exit 1
+    fi
+fi
+
+# ==============================================================================
+# NORMAL MODE (master UI enabled)
+# ==============================================================================
 
 # --- Build Dozzle argument list ----------------------------------------------
 DOZZLE_ARGS=(
@@ -210,6 +276,7 @@ bashio::log.info "  Actions      : ${ENABLE_ACTIONS}"
 bashio::log.info "  Agent        : ${ENABLE_AGENT} (port 7007, name: ${AGENT_HOSTNAME:-default})"
 bashio::log.info "  Remote agents: ${REMOTE_AGENTS:-none}"
 bashio::log.info "  Direct access: ${ENABLE_DIRECT_ACCESS} (port 8088, map in Network tab)"
+bashio::log.info "  TLS certs    : $([ -f /dozzle_cert.pem ] && echo custom || echo shared)"
 bashio::log.info "================================================"
 
 exec /usr/local/bin/dozzle "${DOZZLE_ARGS[@]}"

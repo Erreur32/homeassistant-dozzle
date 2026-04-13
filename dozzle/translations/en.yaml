@@ -16,6 +16,12 @@ configuration:
   enable_actions:
     name: Container actions
     description: Allow restart/stop from the UI (use with care).
+  enable_master:
+    name: "Enable master UI"
+    description: >
+      Enable the Dozzle web interface (Ingress + direct access).
+      Set to false with 'Built-in agent' enabled for agent-only mode
+      (no UI, no nginx - same as the standalone dozzle-agent addon).
   enable_agent:
     name: "Built-in agent - expose this HA host to remote Dozzle"
     description: >
@@ -28,6 +34,18 @@ configuration:
     description: >
       Label shown for this host in remote Dozzle UIs (e.g. "homeassistant").
       Leave empty to use the default hostname.
+  agent_cert:
+    name: "Custom TLS certificate"
+    description: >
+      Filename of the TLS certificate in /ssl/ (e.g. dozzle_cert.pem).
+      When set with agent_key, only Dozzle instances sharing the same key pair
+      can connect to the agent or to remote agents. Both agent and master must
+      use the same certificate.
+  agent_key:
+    name: "Custom TLS key"
+    description: >
+      Filename of the TLS private key in /ssl/ (e.g. dozzle_key.pem).
+      Must match the certificate.
   remote_agents:
     name: "Remote agents - add other Docker hosts"
     description: >

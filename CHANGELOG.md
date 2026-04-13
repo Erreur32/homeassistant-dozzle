@@ -2,6 +2,16 @@
 
 All notable changes to this repository ([homeassistant-dozzle](https://github.com/Erreur32/homeassistant-dozzle)) are documented here. Older **0.2.x** packaging lines are not carried over.
 
+A copy also lives at the repository root: [`CHANGELOG.md`](../CHANGELOG.md).
+
+---
+
+## 0.3.0 - 2026-04-13
+
+- **Agent-only mode:** new `enable_master` option (default `true`). Set to `false` with `enable_agent: true` to run only the agent on port 7007 (no web UI, no nginx). Replaces the standalone [dozzle-agent](https://github.com/Erreur32/homeassistant-dozzle-agent) add-on. (#5)
+- **Custom TLS certificates:** new `agent_cert` / `agent_key` options. Point to cert/key files in `/ssl/` to restrict agent connections to instances sharing the same key pair. By default, Dozzle uses shared certs embedded in the binary (encrypted but not authenticated). (#5)
+- **Docs:** new sections in DOCS.md for agent-only mode, TLS certificate setup, and migration from standalone agent add-on.
+
 ---
 
 ## 0.2.8 - 2026-04-10
@@ -37,8 +47,8 @@ All notable changes to this repository ([homeassistant-dozzle](https://github.co
 
 ## 0.2.3 - 2026-04-08
 
-- **Fix direct access (blank page):** override `DOZZLE_BASE="/"` for the direct-access instance - the global `export DOZZLE_BASE` (ingress token path) was taking priority over the `--base /` CLI flag.
-- **Config:** port 8088 now auto-mapped by default.
+- **Fix direct access (blank page):** override `DOZZLE_BASE="/"` for the direct-access instance - the global `export DOZZLE_BASE` (ingress token path) was taking priority over the `--base /` CLI flag, causing all asset URLs to embed the ingress prefix on port 8088.
+- **Config:** port 8088 now auto-mapped by default (no need to manually enter it in the Network tab).
 
 ---
 
@@ -53,7 +63,15 @@ All notable changes to this repository ([homeassistant-dozzle](https://github.co
 
 - **Fix direct access (blank page):** add WebSocket upgrade headers (`Upgrade`, `Connection`) to the direct-access nginx config - Dozzle uses WebSockets for log streaming; without these headers the page loaded but stayed blank because the real-time connection could not be established.
 - **Fix direct access startup:** nginx now waits for the direct-access Dozzle instance (`:8082`) to be ready before starting, preventing 502 errors on first load.
-- **Icon:** sidebar icon changed from `mdi:text-box-search-outline` to `mdi:docker`.
+- **Icon:** sidebar icon changed from `mdi:text-box-search-outline` to `mdi:docker` (closer to Dozzle's purpose).
+
+---
+
+## 0.2.0 - 2026-04-06
+
+- **New option `enable_direct_access`:** expose Dozzle on port 8088 for direct browser access without the Ingress token prefix. When enabled, a second Dozzle instance starts on `:8082` with `--base /`; nginx serves it on `:8088` without the ingress rewrite. Map port 8088 in the Network tab to use it. Ingress continues to work normally alongside this.
+- **Fix direct port (blank page):** root cause documented - the ingress nginx rewrite adds the token prefix, but asset URLs in the HTML already contain the token, so subsequent requests double-prefix and return 404. The new separate-port architecture avoids this entirely.
+- **New port `8088/tcp`:** added to manifest and translations (fr/en).
 
 ---
 
@@ -65,14 +83,59 @@ All notable changes to this repository ([homeassistant-dozzle](https://github.co
 
 ## 0.1.8 - 2026-04-05
 
-- **Docs:** badges (stars, issues) added to the add-on info page (`dozzle/README.md`).
+- **Docs:** badges (stars, issues) added to the add-on info page.
 - **Cleanup:** replace all em dashes in all project files and scripts.
+
+---
+
+## 0.1.7 - 2026-04-06
+
+- **Fix nginx:** remove `user root;` directive - `initgroups()` is blocked in the HA sandbox; the container already runs as root so the directive is unnecessary.
+- **Fix log warning:** rename `DOZZLE_VERSION` env var to `HA_DOZZLE_BIN_VERSION` - Dozzle treats any `DOZZLE_*` env var as its own config and logged a warning.
+
+---
+
+## 0.1.6 - 2026-04-06
+
+- **Restore `agent_hostname`** option (removed by mistake in 0.1.5) - sets the display name for the built-in agent as seen by remote Dozzle UIs.
+
+---
+
+## 0.1.5 - 2026-04-06
+
+- **Fix Ingress (blank page):** use Dozzle's native `--base` flag with the full ingress token path instead of nginx `sub_filter`. Dozzle rewrites all asset and API URLs to include the token; nginx adds the prefix back (Supervisor strips it before forwarding). No HTML patching needed.
+- **Fix nginx 502:** add wait loop in nginx startup - nginx now waits for Dozzle (:8081) to accept connections before starting.
+- **Simplify agent config:** remove `agent_port` and `agent_hostname` options (port 7007 is hardcoded, hostname label was rarely useful). Updated option descriptions to make the difference between Built-in agent (expose HA outward) and Remote agents (pull in other hosts) explicit.
+
+---
+
+## 0.1.4 - 2026-04-05
+
+- **Fix nginx:** move `client_body_temp_path` / `proxy_temp_path` inside `http {}` block - were incorrectly placed at main context level, causing `directive is not allowed here` fatal error.
+- **Logs:** expose `BUILD_VERSION` and `DOZZLE_VERSION` as runtime env vars (`ENV` in Dockerfile); startup banner now shows app version, Dozzle binary version, ingress URL, proxy layout, and all active options.
+
+---
+
+## 0.1.3 - 2026-04-05
+
+- **Fix nginx startup:** redirect all temp files to `/tmp` (avoids `Permission denied` on `/var/lib/nginx/tmp`); add `-e /dev/stderr` flag so the compiled-in early log path is never hit.
+- **Fix nginx warning:** remove `sub_filter_types text/html` (duplicate of nginx default).
+
+---
+
+## 0.1.2 - 2026-04-05
+
+- **Fix Ingress blank page:** add nginx reverse proxy in front of Dozzle.
+  Dozzle now listens on `:8081` (internal); nginx on `:8080` patches HTML responses:
+  - Replaces absolute asset paths (`="/assets/`) with relative ones (`="./assets/`) so the browser resolves them through the Ingress URL instead of the HA root.
+  - Injects a small JavaScript shim before `</head>` that rewrites `fetch()`, `XMLHttpRequest`, `WebSocket`, and `history.pushState` calls at runtime so all absolute API paths are transparently prefixed with the Ingress base path.
+  - SSE log-streaming endpoints (`/api/*`) bypass buffering (`proxy_buffering off`) to preserve real-time delivery.
 
 ---
 
 ## 0.1.1 - 2026-04-05
 
-- **Security:** enable AppArmor profile (`dozzle/apparmor.txt`) - was `false`, now restricts filesystem, capabilities and network access; improves HA security badge score.
+- **Security:** enable AppArmor profile (`apparmor.txt`) - was `false`, now restricts filesystem, capabilities and network access; improves HA security badge score.
 - **Fix ingress:** set `--base /` (Supervisor strips ingress prefix before forwarding to container - passing the full token path caused 404).
 
 ---
@@ -99,7 +162,7 @@ All notable changes to this repository ([homeassistant-dozzle](https://github.co
 
 ## 0.0.7 - 2026-04-05
 
-- **Fix:** add `dozzle/icon.png` (128×128) and `dozzle/logo.png` (250×100) - icon now visible in the HA add-on store.
+- **Fix:** add `icon.png` (128×128) and `logo.png` (250×100) - icon now visible in the HA add-on store.
 - **Docs:** `DOCS.md` rewritten - logo at top, cleaner option/port tables, 403 GHCR troubleshooting entry.
 
 ---
@@ -119,9 +182,9 @@ All notable changes to this repository ([homeassistant-dozzle](https://github.co
 
 ## 0.0.4 - 2026-04-05
 
-- **Documentation (English):** root [`README.md`](README.md), [`dozzle/README.md`](dozzle/README.md), [`dozzle/DOCS.md`](dozzle/DOCS.md) - clearer structure (tables, sections), shield badges and My Home Assistant add-repo flow; IMPORTANT block corrected (full Dozzle web UI + Ingress, not the agent-only add-on).
-- **Tooling:** [`update_version.sh`](update_version.sh) updates root `README.md` on each bump: `[release-shield]` / `version-vX.Y.Z-blue`, GitHub `releases/tag/vX.Y.Z` URL, and `` `semver` `` for the packaged app version from `dozzle/config.yaml`; the **Bundled Dozzle binary** table row is synced from `ARG DOZZLE_VERSION` in `dozzle/Dockerfile`.
-- **Project:** this file at the repository root; [`dozzle/CHANGELOG.md`](dozzle/CHANGELOG.md) kept in sync for the app folder and existing doc links.
+- **Documentation (English):** repository [`README.md`](../README.md), [`dozzle/README.md`](README.md), [`DOCS.md`](DOCS.md) - clearer structure (tables, sections), shield badges and My Home Assistant add-repo flow; IMPORTANT block corrected (full Dozzle web UI + Ingress, not the agent-only add-on).
+- **Tooling:** [`update_version.sh`](../update_version.sh) updates root `README.md` on each bump: `[release-shield]` / `version-vX.Y.Z-blue`, GitHub `releases/tag/vX.Y.Z` URL, and `` `semver` `` for the packaged app version from `config.yaml`; the **Bundled Dozzle binary** table row is synced from `ARG DOZZLE_VERSION` in `Dockerfile`.
+- **Project:** [`CHANGELOG.md`](../CHANGELOG.md) at the repository root; this file updated in parallel for app-folder links.
 
 ---
 

@@ -6,6 +6,14 @@ A copy also lives at the repository root: [`CHANGELOG.md`](../CHANGELOG.md).
 
 ---
 
+## 0.3.0 - 2026-04-13
+
+- **Agent-only mode:** new `enable_master` option (default `true`). Set to `false` with `enable_agent: true` to run only the agent on port 7007 (no web UI, no nginx). Replaces the standalone [dozzle-agent](https://github.com/Erreur32/homeassistant-dozzle-agent) add-on. (#5)
+- **Custom TLS certificates:** new `agent_cert` / `agent_key` options. Point to cert/key files in `/ssl/` to restrict agent connections to instances sharing the same key pair. By default, Dozzle uses shared certs embedded in the binary (encrypted but not authenticated). (#5)
+- **Docs:** new sections in DOCS.md for agent-only mode, TLS certificate setup, and migration from standalone agent add-on.
+
+---
+
 ## 0.2.8 - 2026-04-10
 
 - **Docs: alerts / log filters guide:** added documentation section explaining how the notification system works (dispatcher + rule setup), expression syntax with examples, and case-sensitivity gotchas. (#2)

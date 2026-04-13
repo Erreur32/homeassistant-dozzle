@@ -32,9 +32,12 @@
 | `filter` | string | *(empty)* | Docker filter string (same syntax as `docker ps --filter`) |
 | `no_analytics` | bool | `true` | Disable anonymous Dozzle analytics |
 | `enable_actions` | bool | `false` | Allow restart/stop actions from the UI *(use with care)* |
+| `enable_master` | bool | `true` | Enable the Dozzle web UI (set to `false` for agent-only mode) |
 | `enable_direct_access` | bool | `false` | Expose Dozzle on port **8088** for direct browser access without Ingress |
 | `enable_agent` | bool | `false` | Expose this HA host to a remote Dozzle instance (see Agent section) |
 | `agent_hostname` | string | *(empty)* | Display name for this node in remote Dozzle UIs |
+| `agent_cert` | string | *(empty)* | Custom TLS certificate filename in `/ssl/` (see TLS section) |
+| `agent_key` | string | *(empty)* | Custom TLS private key filename in `/ssl/` (see TLS section) |
 | `remote_agents` | string | *(empty)* | Comma-separated `host:port` list of remote agents to aggregate here |
 
 ---
@@ -46,6 +49,27 @@
 | `8080/tcp` | Ingress proxy (internal - do not map) |
 | `8088/tcp` | Direct web access - map when `enable_direct_access: true` |
 | `7007/tcp` | Built-in agent - map only when `enable_agent: true` |
+
+---
+
+## Agent-only mode (no web UI)
+
+This add-on can replace the standalone [dozzle-agent](https://github.com/Erreur32/homeassistant-dozzle-agent) add-on entirely. Set:
+
+```yaml
+enable_master: false
+enable_agent: true
+```
+
+This disables the Dozzle web UI and nginx proxy. Only the agent runs on port **7007** as the foreground process (supervised by s6). The behavior is identical to the standalone agent addon.
+
+> [!TIP]
+> If you currently use the standalone **dozzle-agent** add-on, you can migrate to this one:
+> 1. Install this add-on
+> 2. Set `enable_master: false` and `enable_agent: true`
+> 3. Map port **7007** in the Network tab
+> 4. Start and verify the agent works
+> 5. Uninstall the old dozzle-agent add-on
 
 ---
 
@@ -78,6 +102,36 @@ Set `remote_agents` to a comma-separated list of `host:port` addresses pointing 
 ```
 
 Each remote host must be running `dozzle agent` (or this same add-on with **Built-in agent** enabled and port mapped).
+
+---
+
+## TLS certificates (agent security)
+
+The Dozzle agent communicates via **gRPC over TLS**. By default, it uses certificates **shared across all Dozzle installations** (embedded in the binary). This means traffic is encrypted, but **any Dozzle instance can connect** to any agent.
+
+### Custom certificates
+
+To restrict connections so that only **your** Dozzle instances can communicate:
+
+1. **Generate a certificate pair** (once, on any machine):
+   ```bash
+   openssl genpkey -algorithm RSA -out dozzle_key.pem -pkeyopt rsa_keygen_bits:2048
+   openssl req -new -x509 -key dozzle_key.pem -out dozzle_cert.pem -days 3650 \
+       -subj "/CN=dozzle"
+   ```
+
+2. **Copy both files** to your Home Assistant `/ssl/` directory (via Samba, SSH, etc.).
+
+3. **Configure this add-on:**
+   ```yaml
+   agent_cert: "dozzle_cert.pem"
+   agent_key: "dozzle_key.pem"
+   ```
+
+4. **Use the same cert/key pair** on every Dozzle instance (agents and masters) that needs to communicate. Instances with different certs cannot connect to each other.
+
+> [!IMPORTANT]
+> The `agent_cert` / `agent_key` settings apply to **both** the built-in agent (outgoing) **and** connections to remote agents (incoming). All instances in your network must share the same certificate pair.
 
 ---
 
@@ -132,5 +186,6 @@ Dozzle uses [expr-lang](https://expr-lang.org/) expressions. Examples:
 | Direct access blank page | Enable `enable_direct_access` in options **and** map port `8088/tcp` in the Network tab |
 | Agent not reachable from outside | Go to Network tab, set a host port for `7007/tcp` (not mapped by default) |
 | **Alerts not triggering** | 1) Verify a webhook dispatcher exists. 2) Set `log_level: debug` and check addon logs for `[notif-diag]` messages. 3) Alerts only match NEW log entries, not existing ones. |
+| **Agent-only mode not working** | Verify `enable_master: false` AND `enable_agent: true`. Check logs for "AGENT-ONLY MODE" banner. |
 
 For the full release history see [`CHANGELOG.md`](CHANGELOG.md).

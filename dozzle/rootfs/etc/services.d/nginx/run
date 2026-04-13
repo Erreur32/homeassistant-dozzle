@@ -8,6 +8,17 @@
 #      the full token path. nginx adds the prefix back so Dozzle sees it.
 # ==============================================================================
 
+ENABLE_MASTER="$(bashio::config 'enable_master' 'true')"
+
+# --- Agent-only mode: skip nginx entirely ------------------------------------
+if ! bashio::var.true "${ENABLE_MASTER}"; then
+    bashio::log.info "nginx: master UI disabled (agent-only mode) - nginx not needed"
+    # s6 expects the run script to stay alive or exit cleanly.
+    # exec s6-svc -Od . would stop this service, but a simple sleep loop
+    # is more portable across s6-overlay versions.
+    exec sleep infinity
+fi
+
 INGRESS_ENTRY="$(bashio::addon.ingress_entry)"
 ENABLE_DIRECT_ACCESS="$(bashio::config 'enable_direct_access' 'false')"
 
