@@ -1,12 +1,6 @@
-release: v0.3.0
+release: v0.3.2
 
-release: v0.2.8
+release: v0.3.1
 
-release: v0.2.7
-
-fix: revert WebSocket headers that broke ingress proxy (#2)
-
-The Upgrade/Connection headers added in v0.2.5 caused
-"Cannot write to closing transport" errors in the HA Supervisor
-aiohttp proxy. Dozzle uses SSE, not WebSocket - reverted to
-Connection '' (keep-alive). Accept-Encoding "" fix preserved.
+- App version 0.3.1
+- Dozzle binary: v10.3.1 → v10.3.3
