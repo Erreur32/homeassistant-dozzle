@@ -6,6 +6,52 @@ A copy also lives at the repository root: [`CHANGELOG.md`](../CHANGELOG.md).
 
 ---
 
+## 0.3.6 - 2026-05-22
+
+- **Dozzle binary:** upgraded from `v10.5.3` → `v10.6.0` (upstream minor release).
+  - **OOM / kill event notifications:** Dozzle can now fire alerts when a container is OOM-killed or terminated by the runtime.
+  - **Disk I/O stats & volume free-space tracking:** per-container disk I/O metrics and volume usage are exposed in the UI.
+  - **New `disk-fill` default rule (`mountUsedPercent`):** ships out of the box to warn when a mounted volume nears full.
+  - **Runtime detection:** UI shows a Podman or Docker icon depending on the detected runtime.
+  - **Cloud setup redesign:** initial link flow now lets you pick which default signals to enable.
+  - **Misc:** clearer error messages on older Docker daemons; search toolbar keeps working when `⌘F` is rebound; dependency / security updates.
+
+---
+
+## 0.3.5 - 2026-05-13
+
+- **Dozzle binary:** upgraded from `v10.5.2` → `v10.5.3` (upstream patch release).
+  - **Inverse / exclude filter in log search:** match-by-NOT alongside the existing include filter.
+  - **MCP server over Streamable HTTP:** exposed on the existing web server (no extra port).
+  - **Notifications:** new "duplicate destination" action; SSE connection-error handling improved.
+
+---
+
+## 0.3.4 - 2026-05-06
+
+- **Dozzle binary:** upgraded from `v10.4.1` → `v10.5.2` (three upstream releases bundled).
+  - **v10.5.0:** redesigned settings page; gRPC log streaming to Dozzle Cloud; network stats in container stats; ContainerStore data-race fix; parallelized agent initialization.
+  - **v10.5.1:** host-grouping improvements; per-replica cloud connections in Swarm mode.
+  - **v10.5.2:** **Cloud Search** (native indexed log search in the UI); SSRF hardening of the webhook dispatcher (blocks `0.0.0.0/8` and broadcast addresses); WebSocket cross-origin upgrades rejected on `attach` / `exec`; Docker event handling fix (cancellable context, proper channel closure).
+
+---
+
+## 0.3.3 - 2026-04-21
+
+- **Dozzle binary:** upgraded from `v10.3.3` → `v10.4.1` (upstream minor + patch).
+  - **v10.4.0:** native Docker Compose file deployment from the UI.
+  - **v10.4.1:** notification-manager support for Kubernetes cluster services; fix container removal on agents and the queue burst tool-call issue.
+
+---
+
+## 0.3.2 - 2026-04-15
+
+- **Dozzle binary:** upgraded from `v10.3.1` → `v10.3.3` (two upstream patch releases).
+  - **v10.3.2:** welcome modal after cloud linking; cloud connection re-established after Pro-plan upgrade; fixed agent healthcheck address-file path; clearer distinction between cloud unavailability and authentication errors.
+  - **v10.3.3:** healthcheck validation now passes when only agents are configured (relevant to this add-on's agent-only mode introduced in 0.3.0).
+
+---
+
 ## 0.3.0 - 2026-04-13
 
 - **Agent-only mode:** new `enable_master` option (default `true`). Set to `false` with `enable_agent: true` to run only the agent on port 7007 (no web UI, no nginx). Replaces the standalone [dozzle-agent](https://github.com/Erreur32/homeassistant-dozzle-agent) add-on. (#5)
