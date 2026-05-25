@@ -6,6 +6,16 @@ A copy also lives at the repository root: [`CHANGELOG.md`](../CHANGELOG.md).
 
 ---
 
+## 0.3.7 - 2026-05-25
+
+- **Dozzle binary:** upgraded from `v10.6.0` → `v10.6.1` (upstream patch release).
+  - **Paused container state:** the UI now visually distinguishes paused containers from running / stopped ones. (#4731)
+  - **Per-container cloud log filtering:** new `dev.dozzle.cloud.min_level` label lets you filter which log levels a given container forwards to Dozzle Cloud. (#4729)
+  - **Level guesser:** recognises Zigbee2MQTT-style log levels (useful for Home Assistant users running the Z2M add-on alongside this one). (#4733)
+  - **Misc:** non-major dependency updates.
+
+---
+
 ## 0.3.6 - 2026-05-22
 
 - **Dozzle binary:** upgraded from `v10.5.3` → `v10.6.0` (upstream minor release).
