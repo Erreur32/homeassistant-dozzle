@@ -6,6 +6,23 @@ A copy also lives at the repository root: [`CHANGELOG.md`](../CHANGELOG.md).
 
 ---
 
+## 0.3.8 - 2026-05-29
+
+- **Dozzle binary:** upgraded from `v10.6.1` → `v10.6.2` (upstream release).
+  <!-- auto-genere depuis les notes de release GitHub (v10.6.2), a relire/nettoyer -->
+  - **Features:**
+    - **cloud**: Accept container name or id in container-scoped tools
+  - **Bug Fixes:**
+    - Stats charts stale for a few seconds after switching containers
+    - Set Secure flag on jwt cookie when request is HTTPS
+    - Show CPU/Mem as compact pills in container table on mobile
+    - Back off cloud notification dispatcher on invalid API key
+    - Bump cloud search timeout to 3s and map gRPC deadline to 504
+    - Prevent DuckDB MAP inference from breaking log analytics
+    - Improve SQL analytics panel UX
+
+---
+
 ## 0.3.7 - 2026-05-25
 
 - **Dozzle binary:** upgraded from `v10.6.0` → `v10.6.1` (upstream patch release).

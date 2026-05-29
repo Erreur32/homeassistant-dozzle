@@ -22,8 +22,13 @@
 #                fetch + rebase sur origin/<branche> si besoin, push branche et tag.
 #                commit-message.txt est complété avec « release: v<NEW> » si besoin.
 #
+# CHANGELOG (auto, only when the upstream Dozzle binary is bumped):
+#   - dozzle/CHANGELOG.md + CHANGELOG.md (root): a new "## <NEW> - <DATE>" entry is
+#     prepended with the Dozzle vCURRENT → vLATEST line and the upstream release notes
+#     fetched from GitHub (cleaned). Always re-read / trim it afterwards.
+#   - If the Dozzle binary is NOT bumped, CHANGELOG stays manual.
+#
 # Not auto-updated (do manually):
-#   - dozzle/CHANGELOG.md (release notes)
 #   - ARG DOZZLE_VERSION in Dockerfile (bump upstream Dozzle binary separately; README
 #     "Bundled Dozzle binary" row is synced FROM Dockerfile on each app version bump)
 # ──────────────────────────────────────────────────────────────────────────────
@@ -80,9 +85,9 @@ fi
 DOZZLE_LATEST=""
 if command -v curl >/dev/null 2>&1; then
   DOZZLE_LATEST=$(curl -sf --max-time 5 \
-    "https://api.github.com/repos/amir20/dozzle/releases/latest" \
-    | grep '"tag_name"' | head -1 \
-    | sed 's/.*"tag_name":[[:space:]]*"\([^"]*\)".*/\1/' 2>/dev/null || true)
+    "https://api.github.com/repos/amir20/dozzle/releases/latest" |
+    grep '"tag_name"' | head -1 |
+    sed 's/.*"tag_name":[[:space:]]*"\([^"]*\)".*/\1/' 2>/dev/null || true)
 fi
 
 # ── Args: new version + optional --tag-push ─────────────────────────────────
@@ -129,6 +134,96 @@ sedi() {
   local file="$1"
   shift
   sed -i.bak "$@" "$file" && rm -f "${file}.bak"
+}
+
+# ── CHANGELOG auto-generation (used only when the upstream Dozzle binary bumps) ─
+TODAY=$(date +%Y-%m-%d)
+DOZZLE_REPO="amir20/dozzle"
+CHANGELOGS=("$REPO_ROOT/dozzle/CHANGELOG.md" "$REPO_ROOT/CHANGELOG.md")
+
+gen_changelog_entry() {
+  local body cleaned tmp_py block_file f new_esc
+  new_esc=$(echo "$NEW" | sed 's/\./\\./g')
+
+  # Idempotent: skip if an entry for this version already exists
+  if [ -f "${CHANGELOGS[0]}" ] && grep -qE "^## ${new_esc} - " "${CHANGELOGS[0]}" 2>/dev/null; then
+    echo -e "  ${G}✓${R} CHANGELOG.md              ${C}(entry v${NEW} already present, skipped)${R}"
+    return 0
+  fi
+
+  # Fetch upstream release notes (best effort)
+  body=""
+  if command -v curl >/dev/null 2>&1 && command -v jq >/dev/null 2>&1; then
+    body=$(curl -sf --max-time 8 \
+      "https://api.github.com/repos/${DOZZLE_REPO}/releases/tags/${DOZZLE_LATEST}" |
+      jq -r '.body // ""' 2>/dev/null || true)
+  fi
+
+  # Clean the GitHub markdown body into indented CHANGELOG bullets
+  cleaned=""
+  if [ -n "$body" ] && command -v python3 >/dev/null 2>&1; then
+    tmp_py=$(mktemp)
+    cat >"$tmp_py" <<'PYEOF'
+import sys, re
+out = []
+in_section = False                                                # under a "### Features" header?
+for raw in sys.stdin.read().splitlines():
+    line = raw.replace('&nbsp;', ' ')
+    line = re.sub(r'\s*\[<samp>.*?</samp>\]\([^)]*\)', '', line)   # commit links
+    line = re.sub(r'\s+-\s+(by\s+@|in\s+https?://).*$', '', line)  # attribution tail
+    s = line.strip()
+    if not s:
+        continue
+    low = s.lower()
+    if ('view changes on github' in low or 'full changelog' in low
+            or 'new contributors' in low):
+        continue
+    m = re.match(r'^#{2,6}\s*(.*)$', s)                            # section header
+    if m:
+        label = re.sub(r'[^\x00-\x7F]+', '', m.group(1)).strip(' :')
+        if label:
+            out.append('  - **%s:**' % label)                     # section -> 2-space bullet
+            in_section = True
+        continue
+    txt = re.sub(r'^[-*]\s*', '', s)                               # bullet text
+    base = 4 if in_section else 2                                 # nest under the section header
+    extra = 2 if (len(raw) - len(raw.lstrip(' '))) >= 2 else 0    # keep source sub-bullets deeper
+    out.append('%s- %s' % (' ' * (base + extra), txt))
+print('\n'.join(out))
+PYEOF
+    cleaned=$(printf '%s' "$body" | python3 "$tmp_py" 2>/dev/null || true)
+    rm -f "$tmp_py"
+  fi
+  if [ -z "$cleaned" ]; then
+    cleaned="  - TODO: notes de release (fetch GitHub indisponible)"
+  fi
+
+  # Build the new entry block (leading blank + trailing separator)
+  block_file=$(mktemp)
+  {
+    echo ""
+    echo "## ${NEW} - ${TODAY}"
+    echo ""
+    echo "- **Dozzle binary:** upgraded from \`${DOZZLE_CURRENT}\` → \`${DOZZLE_LATEST}\` (upstream release)."
+    echo "  <!-- auto-genere depuis les notes de release GitHub (${DOZZLE_LATEST}), a relire/nettoyer -->"
+    echo "$cleaned"
+    echo ""
+    echo "---"
+  } >"$block_file"
+
+  # Insert after the first '---' separator in each changelog
+  for f in "${CHANGELOGS[@]}"; do
+    [ -f "$f" ] || continue
+    awk -v bf="$block_file" '
+      { print }
+      /^---$/ && !done {
+        while ((getline l < bf) > 0) print l
+        close(bf); done=1
+      }
+    ' "$f" >"${f}.tmp" && mv "${f}.tmp" "$f"
+    echo -e "  ${G}✓${R} ${f#"$REPO_ROOT"/}  ${C}(entry v${NEW} added)${R}"
+  done
+  rm -f "$block_file"
 }
 
 CURRENT_ESC=$(echo "$CURRENT" | sed 's/\./\\./g')
@@ -218,14 +313,14 @@ if [ "$NEW" != "$CURRENT" ]; then
   # Always ensure a usable commit message for -F (avoids the generic fallback)
   if [ ! -f "$COMMIT_MSG_FILE" ]; then
     if [ -n "$DOZZLE_BUMPED" ]; then
-      cat > "$COMMIT_MSG_FILE" << CMEOF
+      cat >"$COMMIT_MSG_FILE" <<CMEOF
 release: v${NEW}
 
 - App version ${NEW}
 - Dozzle binary: ${DOZZLE_CURRENT} → ${DOZZLE_LATEST}
 CMEOF
     else
-      cat > "$COMMIT_MSG_FILE" << CMEOF
+      cat >"$COMMIT_MSG_FILE" <<CMEOF
 release: v${NEW}
 
 - Version ${NEW}
@@ -237,17 +332,29 @@ CMEOF
       echo "release: v${NEW}"
       echo ""
       cat "$COMMIT_MSG_FILE"
-    } > "${COMMIT_MSG_FILE}.tmp" && mv "${COMMIT_MSG_FILE}.tmp" "$COMMIT_MSG_FILE"
+    } >"${COMMIT_MSG_FILE}.tmp" && mv "${COMMIT_MSG_FILE}.tmp" "$COMMIT_MSG_FILE"
     echo -e "  ${G}✓${R} commit-message.txt        ${C}(release: v${NEW} prepended)${R}"
   else
     echo -e "  ${G}✓${R} commit-message.txt        ${C}(already up to date for v${NEW})${R}"
   fi
 
+  # ── CHANGELOG.md (auto) - only when the upstream Dozzle binary was bumped ──
+  if [ -n "$DOZZLE_BUMPED" ]; then
+    echo ""
+    echo -e "  ${B}── CHANGELOG.md (auto) ──${R}"
+    gen_changelog_entry
+  fi
+
   echo ""
   echo -e "${G}${B}Done.${R} App version is now ${B}${NEW}${R}."
   echo ""
-  echo -e "  ${B}── Also update manually ──${R}"
-  echo -e "  ${C}  dozzle/CHANGELOG.md${R}"
+  if [ -n "$DOZZLE_BUMPED" ]; then
+    echo -e "  ${B}── Review (auto-filled) ──${R}"
+    echo -e "  ${C}  dozzle/CHANGELOG.md + CHANGELOG.md${R}  ${Y}(notes Dozzle auto, a relire)${R}"
+  else
+    echo -e "  ${B}── Also update manually ──${R}"
+    echo -e "  ${C}  dozzle/CHANGELOG.md${R}"
+  fi
   echo ""
 fi
 
@@ -293,7 +400,7 @@ do_commit_tag_push() {
       echo "release: v${NEW}"
       echo ""
       cat "$COMMIT_MSG_FILE"
-    } > "${COMMIT_MSG_FILE}.tmp" && mv "${COMMIT_MSG_FILE}.tmp" "$COMMIT_MSG_FILE"
+    } >"${COMMIT_MSG_FILE}.tmp" && mv "${COMMIT_MSG_FILE}.tmp" "$COMMIT_MSG_FILE"
     echo -e "  ${G}✓${R} commit-message.txt        ${C}(updated for v${NEW})${R}"
   fi
 
@@ -301,10 +408,16 @@ do_commit_tag_push() {
     echo -e "  ${B}Uncommitted changes - git add / commit...${R}"
     git add -A
     if [ -f "$COMMIT_MSG_FILE" ] && grep -qE "v${NEW}|release:.*${NEW}" "$COMMIT_MSG_FILE" 2>/dev/null; then
-      git commit -F "$COMMIT_MSG_FILE" || { echo -e "${RED}Commit failed.${R}"; return 1; }
+      git commit -F "$COMMIT_MSG_FILE" || {
+        echo -e "${RED}Commit failed.${R}"
+        return 1
+      }
       echo -e "  ${G}✓${R} Committed with ${C}commit-message.txt${R}"
     else
-      git commit -m "release: v${NEW}" || { echo -e "${RED}Commit failed.${R}"; return 1; }
+      git commit -m "release: v${NEW}" || {
+        echo -e "${RED}Commit failed.${R}"
+        return 1
+      }
       echo -e "  ${G}✓${R} Committed ${C}release: v${NEW}${R}"
     fi
     echo ""
@@ -316,7 +429,10 @@ do_commit_tag_push() {
   if git rev-parse "$tag_name" >/dev/null 2>&1; then
     echo -e "  ${Y}⚠${R} Tag ${C}${tag_name}${R} already exists locally."
   else
-    git tag -a "$tag_name" -m "Release ${tag_name}" || { echo -e "${RED}Tag failed.${R}"; return 1; }
+    git tag -a "$tag_name" -m "Release ${tag_name}" || {
+      echo -e "${RED}Tag failed.${R}"
+      return 1
+    }
     echo -e "  ${G}✓${R} Tag ${C}${tag_name}${R} created."
   fi
 
@@ -345,7 +461,10 @@ do_commit_tag_push() {
         return 1
       }
     fi
-    git push origin "$branch" "$tag_name" || { echo -e "${RED}Push failed.${R}"; return 1; }
+    git push origin "$branch" "$tag_name" || {
+      echo -e "${RED}Push failed.${R}"
+      return 1
+    }
   fi
   echo -e "  ${G}✓${R} Branch + tag pushed."
   echo ""
@@ -369,7 +488,11 @@ fi
 
 if [ "$NEW" != "$CURRENT" ]; then
   echo ""
-  echo -e "${Y}→${R} Edit ${B}commit-message.txt${R} and ${B}dozzle/CHANGELOG.md${R} for v${NEW}."
+  if [ -n "$DOZZLE_BUMPED" ]; then
+    echo -e "${Y}→${R} Review ${B}dozzle/CHANGELOG.md${R} (auto-filled) and edit ${B}commit-message.txt${R} for v${NEW}."
+  else
+    echo -e "${Y}→${R} Edit ${B}commit-message.txt${R} and ${B}dozzle/CHANGELOG.md${R} for v${NEW}."
+  fi
   echo ""
   echo -e "${C}${B}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${R}"
   echo -e "${C}${B}  Commands (copy / paste)${R}"
