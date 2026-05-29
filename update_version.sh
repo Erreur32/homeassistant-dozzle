@@ -3,6 +3,7 @@
 # Bump HA Dozzle app version across the repo (run from project root).
 # Usage:   ./update_version.sh <new_version>
 #          ./update_version.sh <new_version> --tag-push
+#          ./update_version.sh --dozzle            # pure upstream Dozzle bump (see below)
 #
 # Updated files:
 #   1. dozzle/config.yaml     - version (manifest Supervisor / store)
@@ -21,6 +22,13 @@
 #   --tag-push   Après bump : commit (si fichiers modifiés), tag v<NEW>, puis
 #                fetch + rebase sur origin/<branche> si besoin, push branche et tag.
 #                commit-message.txt est complété avec « release: v<NEW> » si besoin.
+#
+#   --dozzle     Commande unique pour un simple bump du binaire Dozzle upstream.
+#                Sans numéro de version : compare ARG DOZZLE_VERSION (Dockerfile) à la
+#                dernière release GitHub ; si plus récente, incrémente la version d'app
+#                (patch, dernier chiffre +1), bumpe Dozzle, génère le CHANGELOG et
+#                commit + tag + push (implique --tag-push). Si Dozzle est déjà à jour,
+#                ne fait rien. (alias : --dozzle-bump)
 #
 # CHANGELOG (auto, only when the upstream Dozzle binary is bumped):
 #   - dozzle/CHANGELOG.md + CHANGELOG.md (root): a new "## <NEW> - <DATE>" entry is
@@ -93,13 +101,36 @@ fi
 # ── Args: new version + optional --tag-push ─────────────────────────────────
 NEW=""
 TAG_PUSH=""
+DOZZLE_ONLY=""
 for arg in "$@"; do
-  if [ "$arg" = "--tag-push" ]; then
-    TAG_PUSH="1"
-  elif [ -z "$NEW" ]; then
-    NEW="$arg"
-  fi
+  case "$arg" in
+  --tag-push) TAG_PUSH="1" ;;
+  --dozzle | --dozzle-bump) DOZZLE_ONLY="1" ;;
+  *) [ -z "$NEW" ] && NEW="$arg" ;;
+  esac
 done
+
+# ── --dozzle: single command for a pure upstream Dozzle bump ────────────────
+#   Auto-increments the app version (patch), bumps the Dozzle binary to latest,
+#   regenerates the CHANGELOG and pushes (implies --tag-push). No version arg.
+if [ -n "$DOZZLE_ONLY" ]; then
+  if [ -z "$DOZZLE_CURRENT" ]; then
+    echo -e "${RED}Error:${R} could not read ARG DOZZLE_VERSION from dozzle/Dockerfile."
+    exit 1
+  fi
+  if [ -z "$DOZZLE_LATEST" ]; then
+    echo -e "${RED}Error:${R} could not fetch the latest Dozzle version (network? GitHub API?)."
+    exit 1
+  fi
+  if [ "$DOZZLE_LATEST" = "$DOZZLE_CURRENT" ]; then
+    echo -e "${G}✓${R} Dozzle binary already up to date (${C}${DOZZLE_CURRENT}${R}). Nothing to do."
+    exit 0
+  fi
+  NEW=$(echo "$CURRENT" | awk -F. '{$NF=$NF+1; print $0}' OFS=.)
+  TAG_PUSH="1"
+  echo ""
+  echo -e "${M}${B}  --dozzle:${R} Dozzle ${Y}${DOZZLE_CURRENT}${R} → ${G}${DOZZLE_LATEST}${R}  (app ${C}${CURRENT}${R} → ${C}${NEW}${R}, auto push)"
+fi
 
 if [ -z "$NEW" ]; then
   SUGGESTED=$(echo "$CURRENT" | awk -F. '{$NF=$NF+1; print $0}' OFS=.)
@@ -121,10 +152,16 @@ if [ -z "$NEW" ]; then
   fi
   echo ""
   echo "  Usage: $0 <new_version> [--tag-push]"
+  echo "         $0 --dozzle"
   echo ""
   echo "  Examples:"
   echo -e "    ${C}$0 ${SUGGESTED}${R}              # bump only"
   echo -e "    ${C}$0 ${SUGGESTED} --tag-push${R}   # bump + commit + tag + push"
+  if [ -n "$DOZZLE_LATEST" ] && [ "$DOZZLE_LATEST" != "$DOZZLE_CURRENT" ]; then
+    echo -e "    ${C}$0 --dozzle${R}           # pure Dozzle bump: auto app +1, changelog, push  ${Y}⬆${R}"
+  else
+    echo -e "    ${C}$0 --dozzle${R}           # pure Dozzle bump: auto app +1, changelog, push"
+  fi
   echo ""
   exit 0
 fi
@@ -220,7 +257,7 @@ PYEOF
         while ((getline l < bf) > 0) print l
         close(bf); done=1
       }
-    ' "$f" >"${f}.tmp" && mv "${f}.tmp" "$f"
+    ' "$f" >"${f}.tmp" && cat "${f}.tmp" >"$f" && rm -f "${f}.tmp"
     echo -e "  ${G}✓${R} ${f#"$REPO_ROOT"/}  ${C}(entry v${NEW} added)${R}"
   done
   rm -f "$block_file"

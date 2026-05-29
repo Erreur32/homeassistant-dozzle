@@ -8,18 +8,14 @@ A copy also lives at the repository root: [`CHANGELOG.md`](../CHANGELOG.md).
 
 ## 0.3.8 - 2026-05-29
 
-- **Dozzle binary:** upgraded from `v10.6.1` → `v10.6.2` (upstream release).
-  <!-- auto-genere depuis les notes de release GitHub (v10.6.2), a relire/nettoyer -->
-  - **Features:**
-    - **cloud**: Accept container name or id in container-scoped tools
-  - **Bug Fixes:**
-    - Stats charts stale for a few seconds after switching containers
-    - Set Secure flag on jwt cookie when request is HTTPS
-    - Show CPU/Mem as compact pills in container table on mobile
-    - Back off cloud notification dispatcher on invalid API key
-    - Bump cloud search timeout to 3s and map gRPC deadline to 504
-    - Prevent DuckDB MAP inference from breaking log analytics
-    - Improve SQL analytics panel UX
+- **Dozzle binary:** upgraded from `v10.6.1` → `v10.6.2` (upstream patch release).
+  - **Cloud tools accept name or id:** container-scoped cloud tools now resolve a container by name as well as by id.
+  - **Stats charts fix:** per-container stats charts no longer stay stale for a few seconds after switching containers.
+  - **Secure JWT cookie:** the auth cookie now sets the `Secure` flag on HTTPS requests.
+  - **Mobile container table:** CPU / memory are shown as compact pills on small screens.
+  - **Cloud notifications:** the dispatcher backs off on an invalid API key instead of retrying tightly.
+  - **Cloud search resiliency:** search timeout raised to 3s and the gRPC deadline mapped to HTTP 504.
+  - **Log analytics:** DuckDB MAP inference no longer breaks log analytics; the SQL analytics panel UX is improved.
 
 ---
 
