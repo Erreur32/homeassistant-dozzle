@@ -1,6 +1,6 @@
-release: v0.3.8
+release: v0.3.9
 
-- App version 0.3.8
-- Dozzle binary: v10.6.1 → v10.6.2
+- App version 0.3.9
+- Dozzle binary: v10.6.2 → v10.6.5
 
 Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>

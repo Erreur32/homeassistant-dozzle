@@ -6,6 +6,26 @@ A copy also lives at the repository root: [`CHANGELOG.md`](../CHANGELOG.md).
 
 ---
 
+## 0.3.9 - 2026-06-14
+
+- **Dozzle binary:** upgraded from `v10.6.2` → `v10.6.5` (upstream releases v10.6.3, v10.6.4, v10.6.5).
+  - **Features:**
+    - Search progress and completion indicator
+  - **Bug Fixes:**
+    - Add font-src to CSP headers
+    - Live log view stalls on busy containers with rotated logs
+    - Expand grouped log lines when copying to clipboard
+    - Rank log level guesses by confidence
+    - Strip control bytes when copying logs to clipboard
+    - Normalize CPU by core count in metric alerts
+    - Prevent alert card header overflow on mobile
+  - **Cloud:**
+    - Resolve read-only container tools in one shot (no extra LLM round-trip)
+    - Default exit alert ignores graceful shutdowns (143/137)
+  - **Dependencies:** routine non-major dependency updates
+
+---
+
 ## 0.3.8 - 2026-05-29
 
 - **Dozzle binary:** upgraded from `v10.6.1` → `v10.6.2` (upstream patch release).
