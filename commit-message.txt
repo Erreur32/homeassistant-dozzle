@@ -1,3 +1,5 @@
+release: v0.3.10
+
 release: v0.3.9
 
 - App version 0.3.9

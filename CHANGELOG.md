@@ -6,6 +6,24 @@ A copy also lives at the repository root: [`CHANGELOG.md`](../CHANGELOG.md).
 
 ---
 
+## 0.3.10 - 2026-06-18
+
+- **Dozzle binary:** upgraded from `v10.6.5` → `v10.6.6` (upstream release).
+  <!-- auto-genere depuis les notes de release GitHub (v10.6.6), a relire/nettoyer -->
+  - **Bug Fixes:**
+    - **deps**:
+      - Update all non-major dependencies
+      - Update all non-major dependencies
+      - Update all non-major dependencies
+      - Update all non-major dependencies
+    - **notifications**:
+      - Match health_status event alerts
+    - **ui**:
+      - Null in JSON array crashes ComplexLogItem
+      - Highlighted URLs staying clickable
+
+---
+
 ## 0.3.9 - 2026-06-14
 
 - **Dozzle binary:** upgraded from `v10.6.2` → `v10.6.5` (upstream releases v10.6.3, v10.6.4, v10.6.5).
