@@ -6,6 +6,16 @@ A copy also lives at the repository root: [`CHANGELOG.md`](../CHANGELOG.md).
 
 ---
 
+## 0.3.11 - 2026-07-28
+
+- **Dozzle binary:** upgraded from `v10.6.6` → `v10.6.13` (upstream release).
+  <!-- auto-genere depuis les notes de release GitHub (v10.6.13), a relire/nettoyer -->
+  - **Bug Fixes:**
+    - Revert sidebar collapse animation from #4862
+    - **deps**: Update all non-major dependencies
+
+---
+
 ## 0.3.10 - 2026-06-18
 
 - **Dozzle binary:** upgraded from `v10.6.5` → `v10.6.6` (upstream release).
