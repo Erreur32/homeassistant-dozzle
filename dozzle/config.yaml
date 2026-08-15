@@ -47,6 +47,10 @@ hassio_api: true
 auth_api: true
 homeassistant_api: false
 
+map:
+  - type: ssl
+    read_only: true
+
 options:
   log_level: info
   filter: ""
