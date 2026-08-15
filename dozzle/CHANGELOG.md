@@ -8,6 +8,7 @@ A copy also lives at the repository root: [`CHANGELOG.md`](../CHANGELOG.md).
 
 ## 0.3.12 - 2026-08-15
 
+- **Fix:** mount the Home Assistant SSL directory (read-only) so the `agent_cert`/`agent_key` options can actually find the certificate files. Thanks to [@maxexcloo](https://github.com/maxexcloo) ([#5](https://github.com/Erreur32/homeassistant-dozzle/pull/5)).
 - **Dozzle binary:** upgraded from `v10.6.13` → `v10.7.1` (upstream release).
   <!-- auto-genere depuis les notes de release GitHub (v10.7.1), a relire/nettoyer -->
   - **Bug Fixes:**
