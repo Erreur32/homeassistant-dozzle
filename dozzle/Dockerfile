@@ -4,13 +4,13 @@
 
 # Global ARGs - must be declared before any FROM to be usable in FROM instructions
 ARG BUILD_FROM=ghcr.io/home-assistant/base:3.23
-ARG DOZZLE_VERSION=v10.7.1
+ARG DOZZLE_VERSION=v10.7.5
 
 FROM amir20/dozzle:${DOZZLE_VERSION} AS dozzle_upstream
 
 FROM ${BUILD_FROM}
 
-ARG BUILD_VERSION=0.3.12
+ARG BUILD_VERSION=0.3.13
 ARG BUILD_ARCH=amd64
 
 # Expose build versions as runtime env vars (readable in run scripts / logs)

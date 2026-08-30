@@ -6,6 +6,28 @@ A copy also lives at the repository root: [`CHANGELOG.md`](../CHANGELOG.md).
 
 ---
 
+## 0.3.13 - 2026-08-30
+
+- **Dozzle binary:** upgraded from `v10.7.1` → `v10.7.5` (upstream release).
+  <!-- auto-genere depuis les notes de release GitHub (v10.7.5), a relire/nettoyer -->
+  - **Breaking Changes:**
+    - **security**: Scope cloud search, alerts and debug to user labels, add notifications role
+  - **Features:**
+    - **auth**: Support excluding roles with ^ prefix
+    - **ui**: Show health status in container table
+  - **Bug Fixes:**
+    - **cloud**:
+      - Gate cloud endpoints behind a new cloud role
+    - **deps**:
+      - Update all non-major dependencies
+      - Update module github.com/yuin/goldmark to v2
+    - **security**:
+      - Apply user label filter to notification preview
+    - **ui**:
+      - Prevent mobile search from jumping
+
+---
+
 ## 0.3.12 - 2026-08-15
 
 - **Fix:** mount the Home Assistant SSL directory (read-only) so the `agent_cert`/`agent_key` options can actually find the certificate files. Thanks to [@maxexcloo](https://github.com/maxexcloo) ([#5](https://github.com/Erreur32/homeassistant-dozzle/pull/5)).
