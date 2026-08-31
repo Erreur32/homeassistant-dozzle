@@ -6,6 +6,23 @@ A copy also lives at the repository root: [`CHANGELOG.md`](../CHANGELOG.md).
 
 ---
 
+## 0.3.14 - 2026-08-31
+
+- **Dozzle binary:** upgraded from `v10.7.5` → `v10.8.0` (upstream release).
+  <!-- auto-genere depuis les notes de release GitHub (v10.8.0), a relire/nettoyer -->
+  - **Features:**
+    - **ui**:
+      - Move status icon next to container name
+      - Show stopped containers on dashboard
+      - Single status icon in sidebar container list
+      - Rebuild cloud welcome modal around the daily scan
+  - **Bug Fixes:**
+    - **deps**:
+      - Update all non-major dependencies
+      - Update all non-major dependencies
+
+---
+
 ## 0.3.13 - 2026-08-30
 
 - **Dozzle binary:** upgraded from `v10.7.1` → `v10.7.5` (upstream release).
