@@ -6,6 +6,78 @@ A copy also lives at the repository root: [`CHANGELOG.md`](../CHANGELOG.md).
 
 ---
 
+## 0.3.17 - 2026-09-24
+
+- **Dozzle binary:** upgraded from `v11.0.1` → `v11.1.1` (upstream release).
+  <!-- auto-genere depuis les notes de release GitHub (v11.1.1), a relire/nettoyer -->
+  - **Features:**
+    - Add &#39;fail&#39; level to level_guesser.go
+    - **auth**:
+      - Add DOZZLE_AUTH_OIDC_SCOPES to request extra OIDC scopes
+    - **charts**:
+      - Read out the hovered bar on host and container stat charts
+    - **icons**:
+      - Add icons for social services, i2p
+      - Add icons for kuvasz
+      - Add icons for mediawiki, tor, asf
+      - Add icons for flipt
+      - Accept a data URI in dev.dozzle.icon
+    - **logs**:
+      - Parse text-prefixed JSON log lines
+    - **pwa**:
+      - Show something when a launch cannot reach the server
+    - **show**:
+      - Support multiple names in /show
+    - **ui**:
+      - Settings page on daisyUI, not-found redesign, history-mode nav
+  - **Bug Fixes:**
+    - **auth**:
+      - Stop an expired session leaving the app on a black page
+    - **charts**:
+      - Follow-ups from the hover readout review
+      - Stop the svg sizing the cell it is measured from
+    - **cloud**:
+      - Re-establish the connection on any paid plan, not just Pro
+      - Fetch the alert history once per page
+    - **container**:
+      - Harden container store, fix closed-channel panic and stats collector leak
+    - **deps**:
+      - Update all non-major dependencies
+      - Update all non-major dependencies
+      - Update all non-major dependencies
+      - Update vueuse monorepo to v15
+      - Update all non-major dependencies
+      - Update all non-major dependencies
+    - **events**:
+      - Discard a stale host refresh that finished after a newer one
+      - Read Podman&#39;s health status off the wire
+    - **k8s**:
+      - Keep finished jobs listed and drop duplicate ReplicaSets
+      - Harden kubernetes mode and remove panics
+      - Alert on CronJob pods and show finished Job logs
+    - **logs**:
+      - Keep an opening burst that overflows maxLogs
+    - **notification**:
+      - Alert on logs from short-lived containers
+    - **pwa**:
+      - Stop iOS blurring the top of the installed app
+    - **settings**:
+      - Only highlight the active section in the settings nav
+      - Report setup state, and show auto-update in About
+      - Offer the update the tag would actually bring
+    - **store**:
+      - Drop containers a host no longer lists
+    - **ui**:
+      - Stop network and disk rates shifting left and right
+      - Narrow the IO card back down
+  - **Performance:**
+    - **charts**: Draw a chart as one path instead of a div per bar
+    - **cloud**: Stop the page fetching config it was already given
+    - **nav**: Mount nav popup contents on first open
+    - **stats**: Keep the stats window out of deep reactivity
+
+---
+
 ## 0.3.16 - 2026-09-12
 
 - **Dozzle binary:** upgraded from `v10.10.0` → `v11.0.1` (upstream release).

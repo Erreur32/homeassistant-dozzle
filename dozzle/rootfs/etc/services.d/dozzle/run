@@ -149,6 +149,18 @@ export DOZZLE_ADDR="${DOZZLE_ADDR}"
 export DOZZLE_LEVEL="${LOG_LEVEL}"
 export DOZZLE_AUTH_PROVIDER="none"
 
+# Since Dozzle v11.1.0, "Actions" also unlocks self-update (Dozzle can pull a
+# newer image and swap its own container via a helper container that only
+# needs the Docker socket - see https://dozzle.dev/guide/setup-wizard#self-update).
+# That container swap happens completely outside the HA Supervisor, which would
+# break ingress, mounts and the watchdog for this add-on. Setting
+# DOZZLE_ENABLE_ACTIONS explicitly (mirrors the enable_actions HA option) locks
+# the setup wizard's "Actions" toggle so it can't drift from /data/dozzle.yml,
+# and DOZZLE_AUTO_UPDATE=off is a hard, non-configurable lock: this add-on's
+# lifecycle must always go through the Supervisor, never Dozzle's own updater.
+export DOZZLE_ENABLE_ACTIONS="${ENABLE_ACTIONS}"
+export DOZZLE_AUTO_UPDATE="off"
+
 if bashio::var.true "${NO_ANALYTICS}"; then
     export DOZZLE_NO_ANALYTICS="true"
 fi
@@ -273,6 +285,7 @@ bashio::log.info "  Listen addr  : ${DOZZLE_ADDR} (nginx :8080 -> here)"
 bashio::log.info "  Log level    : ${LOG_LEVEL}"
 bashio::log.info "  Filter       : ${FILTER:-none}"
 bashio::log.info "  Actions      : ${ENABLE_ACTIONS}"
+bashio::log.info "  Self-update  : locked off (this add-on's lifecycle is managed by HA Supervisor)"
 bashio::log.info "  Agent        : ${ENABLE_AGENT} (port 7007, name: ${AGENT_HOSTNAME:-default})"
 bashio::log.info "  Remote agents: ${REMOTE_AGENTS:-none}"
 bashio::log.info "  Direct access: ${ENABLE_DIRECT_ACCESS} (port 8088, map in Network tab)"

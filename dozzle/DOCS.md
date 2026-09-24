@@ -32,6 +32,7 @@
 | `filter` | string | *(empty)* | Docker filter string (same syntax as `docker ps --filter`) |
 | `no_analytics` | bool | `true` | Disable anonymous Dozzle analytics |
 | `enable_actions` | bool | `false` | Allow restart/stop actions from the UI *(use with care)* |
+| | | | ⚠️ Since Dozzle v11.1.0, enabling Actions also unlocks Dozzle's own "Update" button on containers. This add-on **hard-locks self-update off** (`DOZZLE_AUTO_UPDATE=off`) so Dozzle can never replace its own container behind the HA Supervisor's back - always update this add-on from the HA Supervisor, never from the Dozzle UI. |
 | `enable_master` | bool | `true` | Enable the Dozzle web UI (set to `false` for agent-only mode) |
 | `enable_direct_access` | bool | `false` | Expose Dozzle on port **8088** for direct browser access without Ingress |
 | `enable_agent` | bool | `false` | Expose this HA host to a remote Dozzle instance (see Agent section) |
