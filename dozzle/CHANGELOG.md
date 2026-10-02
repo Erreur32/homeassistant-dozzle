@@ -6,6 +6,43 @@ A copy also lives at the repository root: [`CHANGELOG.md`](../CHANGELOG.md).
 
 ---
 
+## 0.3.18 - 2026-10-02
+
+- **Dozzle binary:** upgraded from `v11.1.1` → `v11.1.3` (upstream release).
+  <!-- auto-genere depuis les notes de release GitHub (v11.1.3), a relire/nettoyer -->
+  - **Features:**
+    - Add docling icon
+    - Add dockhand icon
+    - Update many containers at once, and auto-update labelled containers
+    - **analytics**:
+      - Report setup facts on every beacon and a daily usage beacon
+    - **cloud**:
+      - Count chat opens in the usage beacon
+    - **hosts**:
+      - Add agents from the UI, with an optional private certificate
+    - **icons**:
+      - Add icons for Moodle, Anubis, RainLoop, Postfix, phpMyAdmin, Metabase, Matomo and LiteSpeed
+    - **logs**:
+      - Chart numeric JSON fields in SQL Analytics
+      - Chart numeric results in SQL Analytics as a histogram
+      - Serve DuckDB from Dozzle instead of jsDelivr
+  - **Bug Fixes:**
+    - Bugs, perf and cleanups since v11.1.2
+    - Second review pass since v11.1.2
+    - Update keeps new image defaults, and smoke test fixes
+    - Detect the level in Serilog&#39;s bracketed &quot;[timestamp LVL]&quot; header
+    - **deps**:
+      - Update all non-major dependencies
+      - Update all non-major dependencies
+    - **hosts**:
+      - Total host card CPU against the host&#39;s cores
+    - **icons**:
+      - Swap 49KB docling svg for 64px webp
+    - **logs**:
+      - Keep the view when the log stream reconnects
+
+---
+
 ## 0.3.17 - 2026-09-24
 
 - **Dozzle binary:** upgraded from `v11.0.1` → `v11.1.1` (upstream release).
