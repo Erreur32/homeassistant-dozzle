@@ -6,6 +6,59 @@ A copy also lives at the repository root: [`CHANGELOG.md`](../CHANGELOG.md).
 
 ---
 
+## 0.3.19 - 2026-10-03
+
+- **Dozzle binary:** upgraded from `v11.1.3` → `v11.2.0` (upstream release).
+  <!-- auto-genere depuis les notes de release GitHub (v11.2.0), a relire/nettoyer -->
+  - **Features:**
+    - **cloud**:
+      - Add GetPatternContext RPC for error memory
+      - Show the assistant&#39;s progress as a step trail
+      - Retro_scan, cancellable tool calls, and container run facts
+      - Mark error lines that are new for their container
+      - Open where a new error started from its memory chip
+    - **host**:
+      - Host metrics on the host card (load, disk, uptime)
+      - Watch extra drives and color load against core count
+      - Host metrics for agents
+    - **hosts**:
+      - Disk meter and host footer on mobile
+    - **icons**:
+      - Add icons for rallly
+    - **k8s**:
+      - Rollout restart for deployments, statefulsets and daemonsets
+      - Check for newer images in kubernetes mode
+      - Honor dev.dozzle.name and dev.dozzle.group on pods
+    - **logs**:
+      - Filter a container&#39;s logs by time range
+    - **mobile**:
+      - Native-feeling shell with a floating tab bar
+  - **Bug Fixes:**
+    - Keep the login page out of history after signing in
+    - Drop health once a container stops
+    - **deps**:
+      - Update all non-major dependencies
+    - **k8s**:
+      - Hide the update action in kubernetes mode
+      - Rollout restart for workloads under a custom resource
+    - **logs**:
+      - Don&#39;t label a stopped container&#39;s view as live
+      - Hide the stream bar for a stopped container
+      - Stop treating stopped containers as live everywhere
+      - Keep multi-container views alive and stop offering actions that fail
+    - **mobile**:
+      - Stack toasts above the floating tab bar
+    - **store**:
+      - Keep open views mounted when the events stream reconnects
+    - **ui**:
+      - Don&#39;t redirect away from a container opened while already stopped
+    - **update**:
+      - Recreate containers that share the updated container&#39;s network
+    - **updates**:
+      - Skip exited swarm tasks in update checks
+
+---
+
 ## 0.3.18 - 2026-10-02
 
 - **Dozzle binary:** upgraded from `v11.1.1` → `v11.1.3` (upstream release).
