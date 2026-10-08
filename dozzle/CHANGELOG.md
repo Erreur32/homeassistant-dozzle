@@ -6,6 +6,38 @@ A copy also lives at the repository root: [`CHANGELOG.md`](../CHANGELOG.md).
 
 ---
 
+## 0.3.20 - 2026-10-08
+
+- **Dozzle binary:** upgraded from `v11.2.0` → `v11.3.0` (upstream release).
+  <!-- auto-genere depuis les notes de release GitHub (v11.3.0), a relire/nettoyer -->
+  - **Features:**
+    - **cloud**:
+      - Check_image_updates tool, sharing one fleet check
+      - ContainerUpdate and ImageSnapshot pushes in cloud.proto
+    - **containers**:
+      - Show writable-layer disk size per container
+      - Add Docker volume sizes to the Disk column
+    - **hosts**:
+      - Show reclaimable space on the host card
+    - **settings**:
+      - Split settings into pages, and every setup step in Settings
+    - **updates**:
+      - Safe updates with rollback, auto-update modes, and reporting to Dozzle Cloud
+  - **Bug Fixes:**
+    - **cloud**:
+      - Require a one-time state on the cloud link callback
+      - Only ask error memory about printed log lines
+    - **deps**:
+      - Update all non-major dependencies
+    - **logs**:
+      - Detect Fail2ban log levels correctly
+    - **settings**:
+      - DOZZLE_UPDATE_CONTAINERS, and read-only server settings that read as text
+    - **updates**:
+      - Reliable update records and rollbacks, trim post-11.2 code
+
+---
+
 ## 0.3.19 - 2026-10-03
 
 - **Dozzle binary:** upgraded from `v11.1.3` → `v11.2.0` (upstream release).
