@@ -6,6 +6,63 @@ A copy also lives at the repository root: [`CHANGELOG.md`](../CHANGELOG.md).
 
 ---
 
+## 0.3.21 - 2026-10-13
+
+- **Dozzle binary:** upgraded from `v11.3.0` → `v11.3.2` (upstream release).
+  <!-- auto-genere depuis les notes de release GitHub (v11.3.2), a relire/nettoyer -->
+  - **Features:**
+    - Flat, modern Dozzle logo and mobile bar polish
+    - **analytics**:
+      - Label the SQL chart so the histogram reads on its own
+      - Query logs across older containers with the same name
+    - **containers**:
+      - Align mobile container rows
+      - Network column, drop status column, hide host on single host
+      - Show the image under the container name in the table
+    - **hosts**:
+      - Reclaim space from the reclaimable popover
+    - **icons**:
+      - Add icons for OpenObserve, Browserless, NetAlertX, Pastatool, Fluent Bit, NUT
+    - **inspect**:
+      - Lay out the overview as a fact grid
+    - **logs**:
+      - Move streams and levels into the time chip, actions behind ⋮
+      - Single-letter shortcuts for the log view menus
+      - Copy from merged views, one endpoint for copy and download
+      - Restart, stop and start every container in a merged view
+      - SQL analytics in merged views, loaded in one request
+      - Merge containers across hosts, one stream endpoint
+      - Load older lines for a merged view in one request
+      - Send container log requests as POST
+    - **search**:
+      - Merge a container into the stream from the command palette
+  - **Bug Fixes:**
+    - **chat**:
+      - Send grouped log lines to the assistant as text, not HTML
+    - **config**:
+      - Save dozzle.yml when it is a single-file bind mount
+    - **deps**:
+      - Update all non-major dependencies
+      - Update all non-major dependencies
+    - **docker**:
+      - Start stats for containers started while the event stream was down
+    - **host**:
+      - Measure Docker&#39;s disk via /etc/hostname, not /data
+    - **logs**:
+      - Bugs from the v11.3.1 review
+      - Earlier mid-line level wins, upper-case LOG/PANIC; icons for coolify, beszel, nextcloud aio
+    - **pinned**:
+      - Don&#39;t show a container twice
+    - **search**:
+      - Keep the palette footer hints on one line
+    - **swarm**:
+      - Cancel agent host lookup timeout right away
+  - **Performance:**
+    - **logs**: Copy an unfiltered log from the raw stream
+    - **search**: Read older logs once instead of in doubling windows
+
+---
+
 ## 0.3.20 - 2026-10-08
 
 - **Dozzle binary:** upgraded from `v11.2.0` → `v11.3.0` (upstream release).
