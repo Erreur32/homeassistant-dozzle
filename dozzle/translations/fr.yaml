@@ -21,7 +21,7 @@ configuration:
     description: >
       Active l'interface web Dozzle (Ingress + acces direct).
       Mettre a false avec 'Agent integre' active pour le mode agent seul
-      (pas d'UI, pas de nginx - equivalent a l'addon dozzle-agent standalone).
+      (pas d'UI, nginx repond seulement au watchdog - equivalent a l'addon dozzle-agent standalone).
   enable_agent:
     name: "Agent integre - exposer cet hote HA aux instances Dozzle distantes"
     description: >

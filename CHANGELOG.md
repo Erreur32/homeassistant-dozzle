@@ -6,6 +6,13 @@ A copy also lives at the repository root: [`CHANGELOG.md`](../CHANGELOG.md).
 
 ---
 
+## 0.3.22 - 2026-10-21
+
+- **Fix (agent-only mode):** the Supervisor watchdog probes `:8080/`, but nginx was not started when `enable_master` is `false`, so the check failed forever and the app was restarted every ~4 minutes (`Watchdog found a problem with ... application!`). nginx now serves a static `200` health stub on `:8080` in agent-only mode (no UI behind it).
+- **Fix:** startup banner showed `Dozzle binary: unknown`; the global `ARG DOZZLE_VERSION` is now re-declared in the final build stage so `HA_DOZZLE_BIN_VERSION` is set.
+- **Chore:** `bashio::addon.ingress_entry` replaced by `bashio::app.ingress_entry` (removes the deprecation warning at startup).
+- **Docs:** agent-only descriptions (EN/FR options, DOCS.md) updated for the watchdog stub.
+
 ## 0.3.21 - 2026-10-13
 
 - **Dozzle binary:** upgraded from `v11.3.0` → `v11.3.2` (upstream release).

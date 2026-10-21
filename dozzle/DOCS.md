@@ -62,7 +62,7 @@ enable_master: false
 enable_agent: true
 ```
 
-This disables the Dozzle web UI and nginx proxy. Only the agent runs on port **7007** as the foreground process (supervised by s6). The behavior is identical to the standalone agent addon.
+This disables the Dozzle web UI and the nginx proxy (nginx only answers the Supervisor watchdog on port 8080 with a static 200). Only the agent runs on port **7007** as the foreground process (supervised by s6). The behavior is identical to the standalone agent addon.
 
 > [!TIP]
 > If you currently use the standalone **dozzle-agent** add-on, you can migrate to this one:

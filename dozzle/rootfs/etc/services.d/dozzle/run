@@ -6,7 +6,7 @@
 #          URLs are correctly scoped to the Ingress URL.
 # Agent:   optional built-in dozzle agent on port 7007 (enable_agent option)
 # Agent-only mode: set enable_master=false + enable_agent=true to run
-#          only the agent (no UI, no nginx). Replaces the standalone agent addon.
+#          only the agent (no UI, nginx only serves a watchdog stub). Replaces the standalone agent addon.
 # ==============================================================================
 
 set -e
@@ -47,7 +47,7 @@ fi
 # Supervisor STRIPS /api/hassio_ingress/TOKEN before forwarding to the container.
 # We pass the full token path as --base so Dozzle embeds it in all asset/API URLs.
 # nginx adds the prefix back (dozzle.conf rewrite rule).
-INGRESS_ENTRY="$(bashio::addon.ingress_entry)"
+INGRESS_ENTRY="$(bashio::app.ingress_entry)"
 
 # nginx on :8080 → Dozzle on :8081 (internal only)
 DOZZLE_ADDR=":8081"
@@ -102,7 +102,7 @@ if ! bashio::var.true "${ENABLE_MASTER}"; then
         bashio::log.info "  Log level    : ${LOG_LEVEL}"
         bashio::log.info "  TLS certs    : $([ -f /dozzle_cert.pem ] && echo custom || echo shared)"
         bashio::log.info "  Master UI    : disabled"
-        bashio::log.info "  Nginx        : disabled"
+        bashio::log.info "  Nginx        : watchdog stub on :8080"
         bashio::log.info "================================================"
 
         if bashio::var.has_value "${AGENT_HOSTNAME}"; then

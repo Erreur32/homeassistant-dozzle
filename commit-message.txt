@@ -1,3 +1,12 @@
+release: v0.3.22
+
+- fix: agent-only mode, nginx serves a 200 health stub on :8080 so the
+  Supervisor watchdog stops restarting the app every ~4 min
+- fix: re-declare ARG DOZZLE_VERSION in the final stage (banner showed "unknown")
+- chore: bashio::addon.ingress_entry -> bashio::app.ingress_entry
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
 release: v0.3.21
 
 release: v0.3.20

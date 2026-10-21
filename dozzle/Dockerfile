@@ -10,8 +10,10 @@ FROM amir20/dozzle:${DOZZLE_VERSION} AS dozzle_upstream
 
 FROM ${BUILD_FROM}
 
-ARG BUILD_VERSION=0.3.21
+ARG BUILD_VERSION=0.3.22
 ARG BUILD_ARCH=amd64
+# Re-declare the global ARG so its value is visible in this build stage
+ARG DOZZLE_VERSION
 
 # Expose build versions as runtime env vars (readable in run scripts / logs)
 # Note: DOZZLE_* prefix is reserved by Dozzle itself - use HA_DOZZLE_BIN_VERSION instead

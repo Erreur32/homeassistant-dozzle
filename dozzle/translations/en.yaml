@@ -21,7 +21,7 @@ configuration:
     description: >
       Enable the Dozzle web interface (Ingress + direct access).
       Set to false with 'Built-in agent' enabled for agent-only mode
-      (no UI, no nginx - same as the standalone dozzle-agent addon).
+      (no UI, nginx only answers the watchdog - same as the standalone dozzle-agent addon).
   enable_agent:
     name: "Built-in agent - expose this HA host to remote Dozzle"
     description: >
