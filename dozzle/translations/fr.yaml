@@ -59,3 +59,9 @@ configuration:
       Expose Dozzle sur le port 8088 sans le prefixe token Ingress, accessible
       via http://ip-ha:8088/. Mappez le port 8088 dans l'onglet Reseau.
       Ingress continue de fonctionner normalement en parallele.
+  sidebar_panel:
+    name: "Icône du menu latéral"
+    description: >
+      Icône Dozzle dans le menu latéral de Home Assistant. auto : masquée en mode
+      agent seul (aucune interface à ouvrir), réaffichée quand l'interface master
+      est réactivée. show / hide : force l'état à chaque démarrage.

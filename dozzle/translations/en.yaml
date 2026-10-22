@@ -59,3 +59,9 @@ configuration:
       reach it directly via http://your-ha-ip:8088/.
       Map port 8088 in the Network tab to activate.
       Ingress continues to work normally alongside this.
+  sidebar_panel:
+    name: "Sidebar icon"
+    description: >
+      Dozzle icon in the Home Assistant sidebar. auto: hidden in agent-only mode
+      (no UI to open), restored when the master UI is enabled again.
+      show / hide: force the state on every start.

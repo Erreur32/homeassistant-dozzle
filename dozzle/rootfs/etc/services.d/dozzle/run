@@ -64,6 +64,39 @@ AGENT_CERT="$(bashio::config 'agent_cert' '')"
 AGENT_KEY="$(bashio::config 'agent_key' '')"
 REMOTE_AGENTS="$(bashio::config 'remote_agents' '')"
 ENABLE_DIRECT_ACCESS="$(bashio::config 'enable_direct_access' 'false')"
+SIDEBAR_PANEL="$(bashio::config 'sidebar_panel' 'auto')"
+
+# --- Sidebar panel (HA menu icon) --------------------------------------------
+# auto: hide the icon in agent-only mode (no UI behind it), restore it when the
+#       master UI comes back, only if we hid it ourselves (marker in /data) so a
+#       manual "Show in sidebar" choice is never overridden.
+# show / hide: force the state on every start.
+PANEL_MARKER="/data/.sidebar_panel_auto_hidden"
+set_sidebar_panel() {
+    local wanted="$1" current
+    current="$(bashio::app.ingress_panel 'self' || true)"
+    [ "${current}" = "${wanted}" ] && return 0
+    if bashio::app.ingress_panel 'self' "${wanted}"; then
+        bashio::log.info "Sidebar panel: $([ "${wanted}" = true ] && echo shown || echo hidden)"
+    else
+        bashio::log.warning "Sidebar panel: unable to change the state via the Supervisor API"
+        return 1
+    fi
+}
+case "${SIDEBAR_PANEL}" in
+    show) set_sidebar_panel true || true; rm -f "${PANEL_MARKER}" ;;
+    hide) set_sidebar_panel false || true; rm -f "${PANEL_MARKER}" ;;
+    *)
+        if ! bashio::var.true "${ENABLE_MASTER}" && bashio::var.true "${ENABLE_AGENT}"; then
+            if [ "$(bashio::app.ingress_panel 'self' || true)" = "true" ] \
+                && set_sidebar_panel false; then
+                touch "${PANEL_MARKER}"
+            fi
+        elif [ -f "${PANEL_MARKER}" ]; then
+            if set_sidebar_panel true; then rm -f "${PANEL_MARKER}"; fi
+        fi
+        ;;
+esac
 
 # --- Custom TLS certificates -------------------------------------------------
 # Dozzle agent uses gRPC over TLS. By default it uses SHARED certs compiled

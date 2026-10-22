@@ -24,8 +24,8 @@ This repository ships the **Dozzle** **Home Assistant App** (formerly â€œadd-onâ
 
 |                           |                                                           |
 | ------------------------- | --------------------------------------------------------- |
-| **Packaged app version**  | `0.3.22` (see [`dozzle/config.yaml`](dozzle/config.yaml)) |
-| **Bundled Dozzle binary** | `v11.3.2` (see [`dozzle/Dockerfile`](dozzle/Dockerfile))  |
+| **Packaged app version**  | `0.3.23` (see [`dozzle/config.yaml`](dozzle/config.yaml)) |
+| **Bundled Dozzle binary** | `v11.3.4` (see [`dozzle/Dockerfile`](dozzle/Dockerfile))  |
 | **Container image**       | `ghcr.io/erreur32/homeassistant-dozzle`                   |
 
 [Dozzle](https://github.com/amir20/dozzle) is a lightweight tool to **stream and search Docker container logs** in real time. This packaging connects to the host Docker engine via the Supervisor (`docker_api`), serves the UI through **Ingress** (`ingress_stream`), and can run an optional **embedded agent** or connect to **remote agents**.
@@ -98,12 +98,13 @@ Configurable in the Supervisor UI after install. Full reference: [`dozzle/DOCS.m
 | `agent_cert`           | Custom TLS cert filename in `/ssl/` (see DOCS.md)                        |
 | `agent_key`            | Custom TLS key filename in `/ssl/` (see DOCS.md)                         |
 | `remote_agents`        | Remote `host:port` list (comma-separated)                                |
+| `sidebar_panel`        | Sidebar icon: `auto` (hidden in agent-only mode), `show`, `hide`         |
 
 **Ports (optional):** **8088** - direct web access (when `enable_direct_access` is true); **7007** - agent, only if the embedded agent is enabled and you map the port.
 
 ### Agent-only mode
 
-Set `enable_master: false` + `enable_agent: true` to disable the web UI and run only the agent on port 7007. This replaces the standalone [dozzle-agent](https://github.com/Erreur32/homeassistant-dozzle-agent) add-on.
+Set `enable_master: false` + `enable_agent: true` to disable the web UI and run only the agent on port 7007. This replaces the standalone [dozzle-agent](https://github.com/Erreur32/homeassistant-dozzle-agent) add-on. The sidebar icon is hidden automatically in this mode (`sidebar_panel: auto`).
 
 ---
 
@@ -163,8 +164,8 @@ Repository packaging: see [LICENSE][license] when present in the repo. Upstream 
 [license]: https://github.com/Erreur32/homeassistant-dozzle/blob/main/LICENSE
 [maintenance-shield]: https://img.shields.io/maintenance/yes/2026.svg
 [project-stage-shield]: https://img.shields.io/badge/project%20stage-stable-green.svg
-[release-shield]: https://img.shields.io/badge/version-v0.3.22-blue.svg
-[release]: https://github.com/Erreur32/homeassistant-dozzle/releases/tag/v0.3.22
+[release-shield]: https://img.shields.io/badge/version-v0.3.23-blue.svg
+[release]: https://github.com/Erreur32/homeassistant-dozzle/releases/tag/v0.3.23
 [license-shield]: https://img.shields.io/badge/license-MIT-blue.svg
 [issues-shield]: https://img.shields.io/github/issues/Erreur32/homeassistant-dozzle.svg
 [stars-shield]: https://img.shields.io/github/stars/Erreur32/homeassistant-dozzle.svg

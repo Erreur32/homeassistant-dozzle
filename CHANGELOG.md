@@ -6,6 +6,11 @@ A copy also lives at the repository root: [`CHANGELOG.md`](../CHANGELOG.md).
 
 ---
 
+## 0.3.23 - 2026-10-22
+
+- **Feature (sidebar icon):** new `sidebar_panel` option (`auto` | `show` | `hide`, default `auto`). In `auto`, the Dozzle icon is removed from the HA sidebar in agent-only mode (no UI behind it) and restored when the master UI is enabled again, only if the app hid it itself (a manual "Show in sidebar" choice is never overridden). `show` / `hide` force the state on every start. Uses the Supervisor API through `bashio::app.ingress_panel`; a failure only logs a warning.
+- **Docs:** option documented in EN/FR translations, DOCS.md and README.md.
+
 ## 0.3.22 - 2026-10-21
 
 - **Fix (agent-only mode):** the Supervisor watchdog probes `:8080/`, but nginx was not started when `enable_master` is `false`, so the check failed forever and the app was restarted every ~4 minutes (`Watchdog found a problem with ... application!`). nginx now serves a static `200` health stub on `:8080` in agent-only mode (no UI behind it).

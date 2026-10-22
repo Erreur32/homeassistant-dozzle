@@ -40,6 +40,7 @@
 | `agent_cert` | string | *(empty)* | Custom TLS certificate filename in `/ssl/` (see TLS section) |
 | `agent_key` | string | *(empty)* | Custom TLS private key filename in `/ssl/` (see TLS section) |
 | `remote_agents` | string | *(empty)* | Comma-separated `host:port` list of remote agents to aggregate here |
+| `sidebar_panel` | select | `auto` | HA sidebar icon: `auto` hides it in agent-only mode and restores it with the master UI, `show` / `hide` force it |
 
 ---
 
@@ -63,6 +64,8 @@ enable_agent: true
 ```
 
 This disables the Dozzle web UI and the nginx proxy (nginx only answers the Supervisor watchdog on port 8080 with a static 200). Only the agent runs on port **7007** as the foreground process (supervised by s6). The behavior is identical to the standalone agent addon.
+
+With `sidebar_panel: auto` (default), the Dozzle icon is removed from the HA sidebar in this mode, since there is no UI behind it. It comes back automatically when `enable_master` is set to `true` again.
 
 > [!TIP]
 > If you currently use the standalone **dozzle-agent** add-on, you can migrate to this one:

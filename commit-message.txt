@@ -1,3 +1,11 @@
+release: v0.3.23
+
+- feat: sidebar_panel option (auto|show|hide), auto hides the HA sidebar
+  icon in agent-only mode and restores it with the master UI
+- docs: EN/FR translations, DOCS.md, README.md
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
 release: v0.3.22
 
 - fix: agent-only mode, nginx serves a 200 health stub on :8080 so the

@@ -2,7 +2,7 @@
 # https://developers.home-assistant.io/docs/apps/configuration
 # Do not use the `advanced` key (deprecated since Supervisor 2026.03.0).
 name: "Dozzle"
-version: "0.3.22"
+version: "0.3.23"
 slug: "dozzle"
 description: "Real-time Docker log viewer (Ingress, optional agent)"
 # Project page (support / source of the packaged app for HA)
@@ -63,6 +63,7 @@ options:
   agent_key: ""
   remote_agents: ""
   enable_direct_access: false
+  sidebar_panel: auto
 
 schema:
   log_level: list(trace|debug|info|warn|error|fatal)
@@ -76,6 +77,7 @@ schema:
   agent_key: str?
   remote_agents: str?
   enable_direct_access: bool
+  sidebar_panel: list(auto|show|hide)
 
 # stable: visible in the catalogue without requiring advanced mode (transitioning in Supervisor)
 stage: stable
