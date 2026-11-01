@@ -6,6 +6,39 @@ A copy also lives at the repository root: [`CHANGELOG.md`](../CHANGELOG.md).
 
 ---
 
+## 0.3.24 - 2026-11-01
+
+- **Dozzle binary:** upgraded from `v11.3.4` → `v11.4.0` (upstream release).
+  <!-- auto-genere depuis les notes de release GitHub (v11.4.0), a relire/nettoyer -->
+  - **Features:**
+    - **alerts**:
+      - Add update_available event for newer images
+    - **auth**:
+      - Add an update role to restrict image updates
+    - **icons**:
+      - Add some more icons
+    - **updates**:
+      - Show current and new version for image updates
+      - Add dev.dozzle.update=check to check without updating
+      - Link to release notes before updating
+  - **Bug Fixes:**
+    - Address review findings since v11.3.5
+    - **deps**:
+      - Update all non-major dependencies
+      - Update all non-major dependencies
+      - Update all non-major dependencies
+    - **logs**:
+      - Read the level of Asterisk log lines
+    - **mcp**:
+      - Log tool gaps and container lookup from #5535
+    - **notifications**:
+      - Close the drawer on the first Discard click
+    - **utils**:
+      - Return independent ring buffer snapshots
+      - Copy the input slice in RingBufferFrom
+
+---
+
 ## 0.3.23 - 2026-10-22
 
 - **Feature (sidebar icon):** new `sidebar_panel` option (`auto` | `show` | `hide`, default `auto`). In `auto`, the Dozzle icon is removed from the HA sidebar in agent-only mode (no UI behind it) and restored when the master UI is enabled again, only if the app hid it itself (a manual "Show in sidebar" choice is never overridden). `show` / `hide` force the state on every start. Uses the Supervisor API through `bashio::app.ingress_panel`; a failure only logs a warning.
