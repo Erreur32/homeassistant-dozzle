@@ -1,49 +1,7 @@
-release: v0.3.24
+release: v0.3.25
 
-release: v0.3.23
-
-- feat: sidebar_panel option (auto|show|hide), auto hides the HA sidebar
-  icon in agent-only mode and restores it with the master UI
-- docs: EN/FR translations, DOCS.md, README.md
+- fix: update_version.sh drops previous release messages from
+  commit-message.txt instead of stacking them on every release
+- docs: rewrite the 0.3.24 changelog entry
 
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
-
-release: v0.3.22
-
-- fix: agent-only mode, nginx serves a 200 health stub on :8080 so the
-  Supervisor watchdog stops restarting the app every ~4 min
-- fix: re-declare ARG DOZZLE_VERSION in the final stage (banner showed "unknown")
-- chore: bashio::addon.ingress_entry -> bashio::app.ingress_entry
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
-
-release: v0.3.21
-
-release: v0.3.20
-
-release: v0.3.19
-
-release: v0.3.18
-
-release: v0.3.17
-
-release: v0.3.16
-
-release: v0.3.15
-
-release: v0.3.14
-
-release: v0.3.13
-
-release: v0.3.12
-
-release: v0.3.11
-
-release: v0.3.10
-
-release: v0.3.9
-
-- App version 0.3.9
-- Dozzle binary: v10.6.2 → v10.6.5
-
-Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>

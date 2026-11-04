@@ -67,6 +67,19 @@ ROOT_README="$REPO_ROOT/README.md"
 DOZZLE_README="$REPO_ROOT/dozzle/README.md"
 COMMIT_MSG_FILE="$REPO_ROOT/commit-message.txt"
 
+# Drop the messages of previous releases (from the first "release: v" line on),
+# keep any notes written above them; remove the file if nothing is left.
+strip_stale_commit_msg() {
+  [ -f "$COMMIT_MSG_FILE" ] || return 0
+  grep -qE "v${NEW}|release:.*${NEW}" "$COMMIT_MSG_FILE" 2>/dev/null && return 0
+  awk '/^release: v/{exit} {print}' "$COMMIT_MSG_FILE" >"${COMMIT_MSG_FILE}.tmp"
+  if grep -q '[^[:space:]]' "${COMMIT_MSG_FILE}.tmp"; then
+    mv "${COMMIT_MSG_FILE}.tmp" "$COMMIT_MSG_FILE"
+  else
+    rm -f "${COMMIT_MSG_FILE}.tmp" "$COMMIT_MSG_FILE"
+  fi
+}
+
 # ── Current version from dozzle/config.yaml ─────────────────────────────────
 if [ ! -f "$CONFIG_YAML" ]; then
   echo -e "${RED}Error:${R} $CONFIG_YAML not found"
@@ -348,6 +361,7 @@ if [ "$NEW" != "$CURRENT" ]; then
   echo ""
   echo -e "  ${B}── commit-message.txt ──${R}"
   # Always ensure a usable commit message for -F (avoids the generic fallback)
+  strip_stale_commit_msg
   if [ ! -f "$COMMIT_MSG_FILE" ]; then
     if [ -n "$DOZZLE_BUMPED" ]; then
       cat >"$COMMIT_MSG_FILE" <<CMEOF
@@ -432,6 +446,7 @@ do_commit_tag_push() {
   local tag_name="v${NEW}"
 
   # Commit message: if bumped without --tag-push and tag-push is run later, file may be missing vNEW
+  strip_stale_commit_msg
   if [ -f "$COMMIT_MSG_FILE" ] && ! grep -qE "v${NEW}|release:.*${NEW}" "$COMMIT_MSG_FILE" 2>/dev/null; then
     {
       echo "release: v${NEW}"

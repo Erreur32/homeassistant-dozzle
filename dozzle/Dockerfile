@@ -10,7 +10,7 @@ FROM amir20/dozzle:${DOZZLE_VERSION} AS dozzle_upstream
 
 FROM ${BUILD_FROM}
 
-ARG BUILD_VERSION=0.3.24
+ARG BUILD_VERSION=0.3.25
 ARG BUILD_ARCH=amd64
 # Re-declare the global ARG so its value is visible in this build stage
 ARG DOZZLE_VERSION

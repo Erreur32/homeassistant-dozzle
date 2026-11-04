@@ -6,36 +6,18 @@ A copy also lives at the repository root: [`CHANGELOG.md`](../CHANGELOG.md).
 
 ---
 
+## 0.3.25 - 2026-11-04
+
+- **Fix (release script):** `update_version.sh` no longer stacks every previous release message in `commit-message.txt`. Old `release: v...` blocks are dropped before the new header is added; notes written above them are kept.
+- **Docs:** 0.3.24 changelog entry rewritten.
+
+---
+
 ## 0.3.24 - 2026-11-01
 
-- **Dozzle binary:** upgraded from `v11.3.4` → `v11.4.0` (upstream release).
-  <!-- auto-genere depuis les notes de release GitHub (v11.4.0), a relire/nettoyer -->
-  - **Features:**
-    - **alerts**:
-      - Add update_available event for newer images
-    - **auth**:
-      - Add an update role to restrict image updates
-    - **icons**:
-      - Add some more icons
-    - **updates**:
-      - Show current and new version for image updates
-      - Add dev.dozzle.update=check to check without updating
-      - Link to release notes before updating
-  - **Bug Fixes:**
-    - Address review findings since v11.3.5
-    - **deps**:
-      - Update all non-major dependencies
-      - Update all non-major dependencies
-      - Update all non-major dependencies
-    - **logs**:
-      - Read the level of Asterisk log lines
-    - **mcp**:
-      - Log tool gaps and container lookup from #5535
-    - **notifications**:
-      - Close the drawer on the first Discard click
-    - **utils**:
-      - Return independent ring buffer snapshots
-      - Copy the input slice in RingBufferFrom
+- **Dozzle binary:** upgraded from `v11.3.4` to `v11.4.0` (upstream release).
+  - **Image updates:** shows the current and new version, links to the release notes before updating, and the `dev.dozzle.update=check` label checks without updating. New `update_available` alert event and a new `update` role to restrict who can update images.
+  - **Fixes:** Asterisk log levels are now read, notification drawer closes on the first Discard click, ring buffer snapshot fixes, MCP logging improvements, more icons, dependency updates.
 
 ---
 
