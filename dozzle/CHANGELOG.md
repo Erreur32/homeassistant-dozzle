@@ -6,6 +6,45 @@ A copy also lives at the repository root: [`CHANGELOG.md`](../CHANGELOG.md).
 
 ---
 
+## 0.3.26 - 2026-11-17
+
+- **Dozzle binary:** upgraded from `v11.4.0` → `v11.4.3` (upstream release).
+  <!-- auto-genere depuis les notes de release GitHub (v11.4.3), a relire/nettoyer -->
+  - **Features:**
+    - **agent**:
+      - Let an agent refuse actions and shell
+    - **cloud**:
+      - Mark deploys and alerts on the metrics timeline
+      - Click a metrics bar or deploy to open the logs at that moment
+      - Metrics panel draws memory against its limit, with averages and window ends
+    - **icons**:
+      - Add Music Assistant icon
+    - **notifications**:
+      - Let an alert rule send immediately through Dozzle Cloud
+      - Make the image update check interval configurable
+      - Show send immediately on the alert card
+      - Add cooldowns to log alerts
+    - **remote-hosts**:
+      - Keep retrying remote hosts that were unreachable at startup
+  - **Bug Fixes:**
+    - **agent**:
+      - Keep retrying agents that were unreachable at startup
+    - **auth**:
+      - Keep users with a filter out of setup
+    - **cloud**:
+      - Welcome modal says first findings arrive within minutes
+      - Metrics peak reads the highest sample, plus network and disk
+    - **deps**:
+      - Update all non-major dependencies
+      - Update all non-major dependencies
+    - **notifications**:
+      - Tidy the send-immediately cooldown and log save timing
+      - Open on the alerts tab by default
+    - **swarm**:
+      - Keep retrying configured agents that were unreachable at startup
+
+---
+
 ## 0.3.25 - 2026-11-04
 
 - **Fix (release script):** `update_version.sh` no longer stacks every previous release message in `commit-message.txt`. Old `release: v...` blocks are dropped before the new header is added; notes written above them are kept.

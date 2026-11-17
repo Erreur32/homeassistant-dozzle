@@ -1,7 +1,4 @@
-release: v0.3.25
+release: v0.3.26
 
-- fix: update_version.sh drops previous release messages from
-  commit-message.txt instead of stacking them on every release
-- docs: rewrite the 0.3.24 changelog entry
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+- App version 0.3.26
+- Dozzle binary: v11.4.0 → v11.4.3
